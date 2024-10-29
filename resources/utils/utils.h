@@ -236,15 +236,13 @@ namespace NSUtils
 		    if (pos != std::wstring::npos)
             {
                 std::wstring currDir = path.substr(pos + 1);
-                if (currDir == L"samples")
+				// update to parent directory
+				path = path.substr(0, pos);
+                if (currDir == L"out")
                 {
-                    path += PATH_SEPARATOR;
+					path += PATH_SEPARATOR;
                     path += L"resources";
                     break;
-                }
-                else
-                {
-			        path = path.substr(0, pos);
                 }
             }
             else

@@ -41,14 +41,6 @@ const wchar_t* workDir = L"C:\\Program Files\\ONLYOFFICE\\DocumentBuilder";
 const wchar_t* resultPath = L"result.docx";
 
 // Helper functions
-string cValueToString(CValue value)
-{
-    wchar_t* txt = value.ToString().c_str();
-    wstring ws(txt);
-    string str(ws.begin(), ws.end());
-    return str;
-}
-
 void setTableBorders(CValue oTable, int borderColor)
 {
     oTable.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
