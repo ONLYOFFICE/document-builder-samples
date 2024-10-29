@@ -227,30 +227,30 @@ namespace NSUtils
 		return path;
 	}
 
-    std::wstring GetResourcesDirectory()
-    {
-        std::wstring path = GetProcessDirectory();
-        while (!path.empty())
-        {
-            size_t pos = path.find_last_of(PATH_SEPARATOR);
-		    if (pos != std::wstring::npos)
-            {
-                std::wstring currDir = path.substr(pos + 1);
+	std::wstring GetResourcesDirectory()
+	{
+		std::wstring path = GetProcessDirectory();
+		while (!path.empty())
+		{
+			size_t pos = path.find_last_of(PATH_SEPARATOR);
+			if (pos != std::wstring::npos)
+			{
+				std::wstring currDir = path.substr(pos + 1);
 				// update to parent directory
 				path = path.substr(0, pos);
-                if (currDir == L"out")
-                {
+				if (currDir == L"out")
+				{
 					path += PATH_SEPARATOR;
-                    path += L"resources";
-                    break;
-                }
-            }
-            else
-            {
-                path = L"";
-            }
-        }
+					path += L"resources";
+					break;
+				}
+			}
+			else
+			{
+				path = L"";
+			}
+		}
 
-        return path;
-    }
+		return path;
+	}
 }
