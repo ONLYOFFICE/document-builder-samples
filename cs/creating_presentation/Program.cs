@@ -45,7 +45,7 @@ namespace Sample
     {
         public static void Main(string[] args)
         {
-            string workDirectory = "C:/Program Files/ONLYOFFICE/DocumentBuilder";
+            string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.pptx";
 
             IDictionary<string, string> slideImages = new Dictionary<string, string>() {

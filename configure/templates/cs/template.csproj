@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\..\cs\[TEST_NAME]\Program.cs" />
+    <Compile Include="..\Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="[BUILDER_DIR]\docbuilder.net.dll" />

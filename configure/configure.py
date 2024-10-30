@@ -112,7 +112,7 @@ def genVSProjectsCPP(tests, builder_dir):
             '[BUILDER_DIR]': builder_dir,
             '[ROOT_DIR]': os.getcwd()
         }
-        replacePlaceholders('configure/project_templates/cpp/template.vcxproj', test_dir + '/' + test_name + '.vcxproj', replacements)
+        replacePlaceholders('configure/templates/cpp/template.vcxproj', test_dir + '/' + test_name + '.vcxproj', replacements)
         # .sln
         replacements = {
             '[SOLUTION_GUID]': str(uuid.uuid4()).upper(),
@@ -120,7 +120,7 @@ def genVSProjectsCPP(tests, builder_dir):
             '[PROJECT_GUID]': project_guid.upper(),
             '[EXT_GLOBALS_GUID]': str(uuid.uuid4()).upper()
         }
-        replacePlaceholders('configure/project_templates/cpp/template.sln', test_dir + '/' + test_name + '.sln', replacements)
+        replacePlaceholders('configure/templates/cpp/template.sln', test_dir + '/' + test_name + '.sln', replacements)
         # .vcxproj.filters
         replacements = {
             '[GUID_SOURCE_FILES]': str(uuid.uuid4()).upper(),
@@ -128,12 +128,12 @@ def genVSProjectsCPP(tests, builder_dir):
             '[GUID_RESOURCE_FILES]': str(uuid.uuid4()).upper(),
             '[TEST_NAME]': test_name
         }
-        replacePlaceholders('configure/project_templates/cpp/template.vcxproj.filters', test_dir + '/' + test_name + '.vcxproj.filters', replacements)
+        replacePlaceholders('configure/templates/cpp/template.vcxproj.filters', test_dir + '/' + test_name + '.vcxproj.filters', replacements)
         # .vcxproj.user
         replacements = {
             '[BUILDER_DIR]': builder_dir
         }
-        replacePlaceholders('configure/project_templates/cpp/template.vcxproj.user', test_dir + '/' + test_name + '.vcxproj.user', replacements)
+        replacePlaceholders('configure/templates/cpp/template.vcxproj.user', test_dir + '/' + test_name + '.vcxproj.user', replacements)
 
 def genVSProjectsCS(tests, builder_dir):
     if os_name != 'windows':
@@ -155,7 +155,7 @@ def genVSProjectsCS(tests, builder_dir):
             '[TEST_NAME]': test_name,
             '[BUILDER_DIR]': builder_dir,
         }
-        replacePlaceholders('configure/project_templates/cs/template.csproj', test_dir + '/' + test_name + '.csproj', replacements)
+        replacePlaceholders('configure/templates/cs/template.csproj', test_dir + '/' + test_name + '.csproj', replacements)
         # .sln
         replacements = {
             '[SOLUTION_GUID]': str(uuid.uuid4()).upper(),
@@ -163,7 +163,7 @@ def genVSProjectsCS(tests, builder_dir):
             '[PROJECT_GUID]': project_guid.upper(),
             '[EXT_GLOBALS_GUID]': str(uuid.uuid4()).upper()
         }
-        replacePlaceholders('configure/project_templates/cs/template.sln', test_dir + '/' + test_name + '.sln', replacements)
+        replacePlaceholders('configure/templates/cs/template.sln', test_dir + '/' + test_name + '.sln', replacements)
 
 def genQtProjectsCPP(tests, builder_dir):
     root_dir = os.getcwd()
@@ -185,7 +185,7 @@ def genQtProjectsCPP(tests, builder_dir):
             '[BUILDER_DIR]': builder_dir,
             '[ROOT_DIR]': root_dir
         }
-        replacePlaceholders('configure/project_templates/cpp/template.pro', test_dir + '/' + test_name + '.pro', replacements)
+        replacePlaceholders('configure/templates/cpp/template.pro', test_dir + '/' + test_name + '.pro', replacements)
 
 def genMakefileCPP(tests, builder_dir):
     if os_name == 'windows':
@@ -221,10 +221,16 @@ def genMakefileCPP(tests, builder_dir):
             '[LFLAGS]': lflags,
             '[ENV_LIB_PATH]': env_lib_path
         }
-        replacePlaceholders('configure/project_templates/cpp/Makefile', test_dir + '/Makefile', replacements)
+        replacePlaceholders('configure/templates/cpp/Makefile', test_dir + '/Makefile', replacements)
 
 def genCPP(projects, tests, builder_dir):
     mkdir('out/cpp')
+    # generate header with builder path
+    if not os.path.exists('out/cpp/builder_path.h'):
+        replacements = {
+            '[BUILDER_DIR]': builder_dir.replace('\\', '/')
+        }
+        replacePlaceholders('configure/templates/cpp/builder_path.h', 'out/cpp/builder_path.h', replacements)
     # VS
     if projects['vs']:
         genVSProjectsCPP(tests, builder_dir)
@@ -237,6 +243,12 @@ def genCPP(projects, tests, builder_dir):
 
 def genCS(projects, tests, builder_dir):
     mkdir('out/cs')
+    # generate file with builder path
+    if not os.path.exists('out/cs/Constants.cs'):
+        replacements = {
+            '[BUILDER_DIR]': builder_dir.replace('\\', '/')
+        }
+        replacePlaceholders('configure/templates/cs/Constants.cs', 'out/cs/Constants.cs', replacements)
     # VS
     if projects['vs']:
         genVSProjectsCS(tests, builder_dir)

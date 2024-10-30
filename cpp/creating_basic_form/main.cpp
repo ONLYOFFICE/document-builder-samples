@@ -34,9 +34,11 @@
 #include "common.h"
 #include "docbuilder.h"
 
+#include "out/cpp/builder_path.h"
+
 using namespace NSDoctRenderer;
 
-const wchar_t* workDir = L"C:\\Program Files\\ONLYOFFICE\\DocumentBuilder";
+const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.docx";
 
 // Helper functions

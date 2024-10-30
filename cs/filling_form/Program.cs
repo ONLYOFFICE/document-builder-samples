@@ -46,7 +46,7 @@ namespace Sample
     {
         public static void Main(string[] args)
         {
-            string workDirectory = "C:/Program Files/ONLYOFFICE/DocumentBuilder";
+            string workDirectory = Constants.BUILDER_DIR;
             string filePath = "../../../../../../resources/docs/form.docx";
             string resultPath = "../../../result.docx";
 
