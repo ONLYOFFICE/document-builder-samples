@@ -3,7 +3,7 @@ import argparse
 import platform
 import uuid
 
-langs = ['cpp', 'cs']
+langs = ['cpp', 'cs', 'python']
 os_name = platform.system().lower()
 
 def mkdir(dir):
@@ -255,6 +255,15 @@ def genCS(projects, tests, builder_dir):
     else:
         log('warning', 'generating C# projects only available ' + ('on Windows ' if os_name != 'windows' else '') + 'with --vs')
 
+def genPY(projects, tests, builder_dir):
+    mkdir('out/python')
+    # generate file with builder path
+    if not os.path.exists('out/python/constants.py'):
+        replacements = {
+            '[BUILDER_DIR]': builder_dir.replace('\\', '/')
+        }
+        replacePlaceholders('configure/templates/python/constants.py', 'out/python/constants.py', replacements)
+
 
 if __name__ == '__main__':
     # go to root dir
@@ -293,6 +302,6 @@ if __name__ == '__main__':
     tests_selected = getSelectedTests(args.tests)
     # generate project files
     mkdir('out')
-    handlers = {'cpp': genCPP, 'cs': genCS}
+    handlers = {'cpp': genCPP, 'cs': genCS, 'python': genPY}
     for lang, tests in tests_selected.items():
         handlers[lang](projects, tests, args.dir)

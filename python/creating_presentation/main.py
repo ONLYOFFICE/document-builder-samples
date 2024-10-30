@@ -1,6 +1,8 @@
 import os
 import sys
-sys.path.append('C:/Program Files/ONLYOFFICE/DocumentBuilder')
+sys.path.append('../../out/python')
+import constants
+sys.path.append(constants.BUILDER_DIR)
 import docbuilder
 
 def createImageSlide(api, presentation, image_url):
