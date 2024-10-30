@@ -39,8 +39,6 @@ Generated files will be located in the `out` directory inside of the correspondi
 
 ## Running C++ samples
 
-If Document Builder is not installed in `C:/Program Files/ONLYOFFICE/DocumentBuilder`, for every C++ sample you should change the `workDir` variable at the beginning of *main.cpp* to actual location of Document Builder directory.
-
 ### Visual Studio
 
 > **NOTE:** Only available on Windows
@@ -92,8 +90,6 @@ If Document Builder is not installed in `C:/Program Files/ONLYOFFICE/DocumentBui
 
 > **NOTE:** Only available on Windows with Visual Studio and .NET SDK installed
 
-If Document Builder is not installed in `C:/Program Files/ONLYOFFICE/DocumentBuilder`, for every C# sample you should change the `workDirectory` variable at the beginning of `Main` function to actual location of Document Builder directory.
-
 ### Visual Studio
  1. Use `configure.py` to generate VS project files. For example:
 
@@ -106,16 +102,18 @@ If Document Builder is not installed in `C:/Program Files/ONLYOFFICE/DocumentBui
 
 ## Running Python samples
 
- 1. Go to test directory:
+ 1. Execute `configure.py` with `--test python`:
+
+    ```shell
+    python configure.py --test python
+    ```
+    Provide directory to Document Builder with `--dir` if necessary.
+
+    It is needed for generating auxiliary module containing the path to Document Builder.
+ 2. Go to test directory:
 
     ```shell
     cd python/creating_basic_form
-    ```
-
- 2. If it is needed, edit path to builder directory at the beginning of the python script:
-
-    ```py
-    sys.path.append('C:/Program Files/ONLYOFFICE/DocumentBuilder')
     ```
  3. Run the script
 
