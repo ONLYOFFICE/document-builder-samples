@@ -121,15 +121,7 @@ def genVSProjectsCPP(tests, builder_dir):
             '[EXT_GLOBALS_GUID]': str(uuid.uuid4()).upper()
         }
         replacePlaceholders('configure/templates/cpp/template.sln', test_dir + '/' + test_name + '.sln', replacements)
-        # .vcxproj.filters
-        replacements = {
-            '[GUID_SOURCE_FILES]': str(uuid.uuid4()).upper(),
-            '[GUID_HEADER_FILES]': str(uuid.uuid4()).upper(),
-            '[GUID_RESOURCE_FILES]': str(uuid.uuid4()).upper(),
-            '[TEST_NAME]': test_name
-        }
-        replacePlaceholders('configure/templates/cpp/template.vcxproj.filters', test_dir + '/' + test_name + '.vcxproj.filters', replacements)
-        # .vcxproj.user
+        # .vcxproj.user - for setting PATH when running program to find dll-s
         replacements = {
             '[BUILDER_DIR]': builder_dir
         }
