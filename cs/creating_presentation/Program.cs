@@ -49,10 +49,10 @@ namespace Sample
             string resultPath = "../../../result.pptx";
 
             IDictionary<string, string> slideImages = new Dictionary<string, string>() {
-                { "gun", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_gun.png" },
-                { "axe","https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_axe.png" },
-                { "knight", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_knight.png" },
-                { "sky","https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_sky.png" }
+                { "gun", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_gun.png" },
+                { "axe","https://static.onlyoffice.com/assets/docs/samples/img/presentation_axe.png" },
+                { "knight", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_knight.png" },
+                { "sky","https://static.onlyoffice.com/assets/docs/samples/img/presentation_sky.png" }
             };
         // add Docbuilder dlls in path
         System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + workDirectory);

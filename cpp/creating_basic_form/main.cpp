@@ -42,7 +42,7 @@ const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.docx";
 
 // Helper functions
-void setPictureFormProperties(CValue oPictureForm, std::string key, std::string tip, bool required, std::string placeholder, std::string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY, std::string imageUrl)
+void setPictureFormProperties(CValue oPictureForm, std::string key, std::string tip, bool required, std::string placeholder, std::string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
 {
     oPictureForm.Call("SetFormKey", key.c_str());
     oPictureForm.Call("SetTipText", tip.c_str());
@@ -52,7 +52,6 @@ void setPictureFormProperties(CValue oPictureForm, std::string key, std::string 
     oPictureForm.Call("SetLockAspectRatio", lockAspectRatio);
     oPictureForm.Call("SetRespectBorders", respectBorders);
     oPictureForm.Call("SetPicturePosition", shiftX, shiftY);
-    oPictureForm.Call("SetImage", imageUrl.c_str());
 }
 void setTextFormProperties(CValue oTextForm, std::string key, std::string tip, bool required, std::string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)
 {
@@ -91,7 +90,7 @@ int main()
     oDocument.Call("Push", oParagraph);
 
     CValue oPictureForm = oApi.Call("CreatePictureForm");
-    setPictureFormProperties(oPictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50, "https://api.onlyoffice.com/content/img/docbuilder/examples/user-profile.png");
+    setPictureFormProperties(oPictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50);
     oParagraph = oApi.Call("CreateParagraph");
     oParagraph.Call("AddElement", oPictureForm);
     oDocument.Call("Push", oParagraph);

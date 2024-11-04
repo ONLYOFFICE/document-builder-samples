@@ -51,9 +51,9 @@ namespace Sample
             string resultPath = "../../../result.docx";
 
             IDictionary<string, string> formData = new Dictionary<string, string>() {
-                { "Photo", "https://api.onlyoffice.com/content/img/docbuilder/examples/blue_cloud.png" },
+                { "Photo", "https://static.onlyoffice.com/assets/docs/samples/img/onlyoffice_logo.png" },
                 { "Serial","A1345" },
-                { "Company Name", "Blue Cloud" },
+                { "Company Name", "ONLYOFFICE" },
                 { "Date", "25.12.2023" },
                 { "Recipient", "Space Corporation" },
                 { "Qty1", "25" },

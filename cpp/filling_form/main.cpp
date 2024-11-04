@@ -48,9 +48,9 @@ const wchar_t* resultPath = L"result.docx";
 int main()
 {
     std::map<wstring, wstring> formData;
-    formData[L"Photo"] = L"https://api.onlyoffice.com/content/img/docbuilder/examples/blue_cloud.png";
+    formData[L"Photo"] = L"https://static.onlyoffice.com/assets/docs/samples/img/onlyoffice_logo.png";
     formData[L"Serial"] = L"A1345";
-    formData[L"Company Name"] = L"Blue Cloud";
+    formData[L"Company Name"] = L"ONLYOFFICE";
     formData[L"Date"] = L"25.12.2023";
     formData[L"Recipient"] = L"Space Corporation";
     formData[L"Qty1"] = L"25";

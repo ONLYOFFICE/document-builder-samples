@@ -6,7 +6,7 @@ sys.path.append(constants.BUILDER_DIR)
 import docbuilder
 
 # Helper functions
-def setPictureFormProperties(pictureForm, key, tip, required, placeholder, scaleFlag, lockAspectRatio, respectBorders, shiftX, shiftY, imageUrl):
+def setPictureFormProperties(pictureForm, key, tip, required, placeholder, scaleFlag, lockAspectRatio, respectBorders, shiftX, shiftY):
     pictureForm.Call('SetFormKey', key)
     pictureForm.Call('SetTipText', tip)
     pictureForm.Call('SetRequired', required)
@@ -15,7 +15,6 @@ def setPictureFormProperties(pictureForm, key, tip, required, placeholder, scale
     pictureForm.Call('SetLockAspectRatio', lockAspectRatio)
     pictureForm.Call('SetRespectBorders', respectBorders)
     pictureForm.Call('SetPicturePosition', shiftX, shiftY)
-    pictureForm.Call('SetImage', imageUrl)
 
 def setTextFormProperties(textForm, key, tip, required, placeholder, comb, maxCharacters, cellWidth, multiLine, autoFit):
     textForm.Call('SetFormKey', key)
@@ -45,7 +44,7 @@ if __name__ == '__main__':
     document.Call('Push', paragraph)
 
     pictureForm = api.Call('CreatePictureForm')
-    setPictureFormProperties(pictureForm, 'Photo', 'Upload your photo', False, 'Photo', 'tooBig', True, False, 50, 50, 'https://api.onlyoffice.com/content/img/docbuilder/examples/user-profile.png')
+    setPictureFormProperties(pictureForm, 'Photo', 'Upload your photo', False, 'Photo', 'tooBig', True, False, 50, 50)
     paragraph = api.Call('CreateParagraph')
     paragraph.Call('AddElement', pictureForm)
     document.Call('Push', paragraph)

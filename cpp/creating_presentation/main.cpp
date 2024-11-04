@@ -72,10 +72,10 @@ void addTextToSlideShape(CValue oApi, CValue oContent, string text, int fontSize
 int main()
 {
     map<string, string>slideImages;
-    slideImages["gun"] = "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_gun.png";
-    slideImages["axe"] = "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_axe.png";
-    slideImages["knight"] = "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_knight.png";
-    slideImages["sky"] = "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_sky.png";
+    slideImages["gun"] = "https://static.onlyoffice.com/assets/docs/samples/img/presentation_gun.png";
+    slideImages["axe"] = "https://static.onlyoffice.com/assets/docs/samples/img/presentation_axe.png";
+    slideImages["knight"] = "https://static.onlyoffice.com/assets/docs/samples/img/presentation_knight.png";
+    slideImages["sky"] = "https://static.onlyoffice.com/assets/docs/samples/img/presentation_sky.png";
 
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);

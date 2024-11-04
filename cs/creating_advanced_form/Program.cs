@@ -80,7 +80,7 @@ namespace Sample
             oDocument.Call("Push", oTable);
 
             CValue oPictureForm = oApi.Call("CreatePictureForm");
-            setPictureFormProperties(oPictureForm, "Photo", "Upload company logo", false, "Photo", "tooBig", false, false, 0, 0, "https://api.onlyoffice.com/content/img/docbuilder/examples/user-profile.png");
+            setPictureFormProperties(oPictureForm, "Photo", "Upload company logo", false, "Photo", "tooBig", false, false, 0, 0);
             oParagraph = oApi.Call("CreateParagraph");
             oParagraph.Call("AddElement", oPictureForm);
             oDocument.Call("Push", oParagraph);
@@ -172,7 +172,7 @@ namespace Sample
             oParagraph.Call("SetBold", isBold);
         }
 
-        public static void setPictureFormProperties(CValue oPictureForm, string key, string tip, bool required, string placeholder, string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY, string imageUrl)
+        public static void setPictureFormProperties(CValue oPictureForm, string key, string tip, bool required, string placeholder, string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
         {
             oPictureForm.Call("SetFormKey", key);
             oPictureForm.Call("SetTipText", tip);
@@ -182,7 +182,6 @@ namespace Sample
             oPictureForm.Call("SetLockAspectRatio", lockAspectRatio);
             oPictureForm.Call("SetRespectBorders", respectBorders);
             oPictureForm.Call("SetPicturePosition", shiftX, shiftY);
-            oPictureForm.Call("SetImage", imageUrl);
         }
 
         public static void setTextFormProperties(CValue oTextForm, string key, string tip, bool required, string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)

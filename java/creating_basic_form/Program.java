@@ -32,7 +32,7 @@ public class Program {
         document.call("Push", paragraph);
 
         CDocBuilderValue pictureForm = api.call("CreatePictureForm");
-        setPictureFormProperties(pictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50, "https://api.onlyoffice.com/content/img/docbuilder/examples/user-profile.png");
+        setPictureFormProperties(pictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50);
         paragraph = api.call("CreateParagraph");
         paragraph.call("AddElement", pictureForm);
         document.call("Push", paragraph);
@@ -50,7 +50,7 @@ public class Program {
         CDocBuilder.dispose();
     }
 
-    public static void setPictureFormProperties(CDocBuilderValue pictureForm, String key, String tip, boolean required, String placeholder, String scaleFlag, boolean lockAspectRatio, boolean respectBorders, int shiftX, int shiftY, String imageUrl) {
+    public static void setPictureFormProperties(CDocBuilderValue pictureForm, String key, String tip, boolean required, String placeholder, String scaleFlag, boolean lockAspectRatio, boolean respectBorders, int shiftX, int shiftY) {
         pictureForm.call("SetFormKey", key);
         pictureForm.call("SetTipText", tip);
         pictureForm.call("SetRequired", required);
@@ -59,7 +59,6 @@ public class Program {
         pictureForm.call("SetLockAspectRatio", lockAspectRatio);
         pictureForm.call("SetRespectBorders", respectBorders);
         pictureForm.call("SetPicturePosition", shiftX, shiftY);
-        pictureForm.call("SetImage", imageUrl);
     }
 
     public static void setTextFormProperties(CDocBuilderValue textForm, String key, String tip, boolean required, String placeholder, boolean comb, int maxCharacters, int cellWidth, boolean multiLine, boolean autoFit) {

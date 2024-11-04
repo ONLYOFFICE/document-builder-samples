@@ -7,10 +7,10 @@ public class Program {
         String resultPath = "result.pptx";
         // Fill slide images
         HashMap<String, String> slideImages = new HashMap<String, String>();
-        slideImages.put("gun", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_gun.png");
-        slideImages.put("axe", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_axe.png");
-        slideImages.put("knight", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_knight.png");
-        slideImages.put("sky", "https://api.onlyoffice.com/content/img/docbuilder/examples/presentation_sky.png");
+        slideImages.put("gun", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_gun.png");
+        slideImages.put("axe", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_axe.png");
+        slideImages.put("knight", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_knight.png");
+        slideImages.put("sky", "https://static.onlyoffice.com/assets/docs/samples/img/presentation_sky.png");
 
         createPresentation(resultPath, slideImages);
 
