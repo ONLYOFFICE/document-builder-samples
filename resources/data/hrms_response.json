@@ -1,0 +1,55 @@
+{
+    "employee": {
+        "name": "Dmitry Kovalev",
+        "position": "Data Analyst",
+        "department": "Analytics Department"
+    },
+    "competencies": {
+        "technical_skills": [
+            {
+                "name": "Data Analysis",
+                "level": "Intermediate"
+            },
+            {
+                "name": "SQL",
+                "level": "Advanced"
+            },
+            {
+                "name": "Python",
+                "level": "Beginner"
+            }
+        ],
+        "soft_skills": [
+            {
+                "name": "Communication",
+                "level": "Intermediate"
+            },
+            {
+                "name": "Teamwork",
+                "level": "Advanced"
+            }
+        ]
+    },
+    "development_areas": [
+        "Improving Python proficiency",
+        "Learning advanced data analysis methods",
+        "Enhancing client communication skills"
+    ],
+    "goals_next_year": [
+        "Improving technical Python skills to Advanced level",
+        "Completing a course on advanced data analysis methods",
+        "Passing the internal communication skills exam"
+    ],
+    "resources": [
+        {
+            "name": "Course 'Data Science with Python'",
+            "provider": "Coursera",
+            "duration": "3 months"
+        },
+        {
+            "name": "Internal communication training",
+            "provider": "HR Department",
+            "duration": "1 month"
+        }
+    ]
+}
