@@ -30,24 +30,47 @@ def addTextToParagraph(paragraph, text, font_size, is_bold=False, jc='left'):
     paragraph.Call('SetBold', is_bold)
     paragraph.Call('SetJc', jc)
 
-def createTable(api, rows, cols, border_color):
+def createTable(api, rows, cols, border_color=200):
     # create table
     table = api.Call('CreateTable', cols, rows)
     # set table properties
     table.Call('SetWidth', 'percent', 100)
-    table.Call('SetTableCellMarginTop', 200);
-    table.Call('GetRow', 0).Call('SetBackgroundColor', 245, 245, 245);
+    table.Call('SetTableCellMarginTop', 200)
+    table.Call('GetRow', 0).Call('SetBackgroundColor', 245, 245, 245)
     # set table borders
-    table.Call('SetTableBorderTop', 'single', 4, 0, border_color, border_color, border_color);
-    table.Call('SetTableBorderBottom', 'single', 4, 0, border_color, border_color, border_color);
-    table.Call('SetTableBorderLeft', 'single', 4, 0, border_color, border_color, border_color);
-    table.Call('SetTableBorderRight', 'single', 4, 0, border_color, border_color, border_color);
-    table.Call('SetTableBorderInsideV', 'single', 4, 0, border_color, border_color, border_color);
-    table.Call('SetTableBorderInsideH', 'single', 4, 0, border_color, border_color, border_color);
+    table.Call('SetTableBorderTop', 'single', 4, 0, border_color, border_color, border_color)
+    table.Call('SetTableBorderBottom', 'single', 4, 0, border_color, border_color, border_color)
+    table.Call('SetTableBorderLeft', 'single', 4, 0, border_color, border_color, border_color)
+    table.Call('SetTableBorderRight', 'single', 4, 0, border_color, border_color, border_color)
+    table.Call('SetTableBorderInsideV', 'single', 4, 0, border_color, border_color, border_color)
+    table.Call('SetTableBorderInsideH', 'single', 4, 0, border_color, border_color, border_color)
     return table
 
 def getTableCellParagraph(table, row, col):
     return table.Call('GetCell', row, col).Call('GetContent').Call('GetElement', 0)
+
+def fillTableHeaders(table, data, font_size):
+    for i in range(len(data)):
+        paragraph = getTableCellParagraph(table, 0, i)
+        addTextToParagraph(paragraph, data[i], font_size, True)
+
+def fillTableBody(table, data, keys, font_size, start_row=1):
+    for row in range(len(data)):
+        for col, key in enumerate(keys):
+            paragraph = getTableCellParagraph(table, row + start_row, col)
+            addTextToParagraph(paragraph, str(data[row][key]), font_size)
+
+def createNumbering(api, data, numbering_type, font_size):
+    document = api.Call('GetDocument')
+    numbering = document.Call('CreateNumbering', numbering_type)
+    numbering_level = numbering.Call('GetLevel', 0)
+    for entry in data:
+        paragraph = api.Call('CreateParagraph')
+        paragraph.Call('SetNumbering', numbering_level)
+        addTextToParagraph(paragraph, str(entry), font_size)
+        document.Call('Push', paragraph)
+    # return the last paragraph in numbering
+    return paragraph
 
 if __name__ == '__main__':
     resources_dir = os.path.normpath('../../resources')
@@ -91,16 +114,9 @@ if __name__ == '__main__':
     document.Call('Push', paragraph)
     # technical skills table
     technical_skills = data['competencies']['technical_skills']
-    table = createTable(api, len(technical_skills) + 1, 2, 200)
-    paragraph = getTableCellParagraph(table, 0, 0)
-    addTextToParagraph(paragraph, 'Skill', 22, True)
-    paragraph = getTableCellParagraph(table, 0, 1)
-    addTextToParagraph(paragraph, 'Level', 22, True)
-    for i in range(len(technical_skills)):
-        paragraph_skill = getTableCellParagraph(table, i + 1, 0)
-        addTextToParagraph(paragraph_skill, str(technical_skills[i]['name']), 22)
-        paragraph_level = getTableCellParagraph(table, i + 1, 1)
-        addTextToParagraph(paragraph_level, str(technical_skills[i]['level']), 22)
+    table = createTable(api, len(technical_skills) + 1, 2)
+    fillTableHeaders(table, ['Skill', 'Level'], 22)
+    fillTableBody(table, technical_skills, ['name', 'level'], 22)
     document.Call('Push', table)
     # soft skills sub-header
     paragraph = api.Call('CreateParagraph')
@@ -108,16 +124,9 @@ if __name__ == '__main__':
     document.Call('Push', paragraph)
     # soft skills table
     soft_skills = data['competencies']['soft_skills']
-    table = createTable(api, len(soft_skills) + 1, 2, 200)
-    paragraph = getTableCellParagraph(table, 0, 0)
-    addTextToParagraph(paragraph, 'Skill', 22, True)
-    paragraph = getTableCellParagraph(table, 0, 1)
-    addTextToParagraph(paragraph, 'Level', 22, True)
-    for i in range(len(soft_skills)):
-        paragraph_skill = getTableCellParagraph(table, i + 1, 0)
-        addTextToParagraph(paragraph_skill, str(soft_skills[i]['name']), 22)
-        paragraph_level = getTableCellParagraph(table, i + 1, 1)
-        addTextToParagraph(paragraph_level, str(soft_skills[i]['level']), 22)
+    table = createTable(api, len(soft_skills) + 1, 2)
+    fillTableHeaders(table, ['Skill', 'Level'], 22)
+    fillTableBody(table, soft_skills, ['name', 'level'], 22)
     document.Call('Push', table)
 
     # DEVELOPMENT AREAS section
@@ -125,15 +134,8 @@ if __name__ == '__main__':
     paragraph = api.Call('CreateParagraph')
     addTextToParagraph(paragraph, 'Development areas', 32, True)
     document.Call('Push', paragraph)
-    # numbering
-    development_areas = data['development_areas']
-    numbering = document.Call('CreateNumbering', 'numbered')
-    numbering_level = numbering.Call('GetLevel', 0)
-    for area in development_areas:
-        paragraph = api.Call('CreateParagraph')
-        paragraph.Call('SetNumbering', numbering_level)
-        addTextToParagraph(paragraph, str(area), 22)
-        document.Call('Push', paragraph)
+    # list
+    createNumbering(api, data['development_areas'], 'numbered', 22)
 
     # GOALS section
     # header
@@ -141,14 +143,7 @@ if __name__ == '__main__':
     addTextToParagraph(paragraph, 'Goals for next year', 32, True)
     document.Call('Push', paragraph)
     # numbering
-    goals_next_year = data['goals_next_year']
-    numbering = document.Call('CreateNumbering', 'numbered')
-    numbering_level = numbering.Call('GetLevel', 0)
-    for goal in goals_next_year:
-        paragraph = api.Call('CreateParagraph')
-        paragraph.Call('SetNumbering', numbering_level)
-        addTextToParagraph(paragraph, str(goal), 22)
-        document.Call('Push', paragraph)
+    paragraph = createNumbering(api, data['goals_next_year'], 'numbered', 22)
     # add a page break after the last paragraph
     paragraph.Call('AddPageBreak')
 
@@ -159,20 +154,9 @@ if __name__ == '__main__':
     document.Call('Push', paragraph)
     # table
     resources = data['resources']
-    table = createTable(api, len(resources) + 1, 3, 200)
-    paragraph = getTableCellParagraph(table, 0, 0)
-    addTextToParagraph(paragraph, 'Name', 22, True)
-    paragraph = getTableCellParagraph(table, 0, 1)
-    addTextToParagraph(paragraph, 'Provider', 22, True)
-    paragraph = getTableCellParagraph(table, 0, 2)
-    addTextToParagraph(paragraph, 'Duration', 22, True)
-    for i in range(len(resources)):
-        paragraph_name = getTableCellParagraph(table, i + 1, 0)
-        addTextToParagraph(paragraph_name, str(resources[i]['name']), 22)
-        paragraph_provider = getTableCellParagraph(table, i + 1, 1)
-        addTextToParagraph(paragraph_provider, str(resources[i]['provider']), 22)
-        paragraph_duration = getTableCellParagraph(table, i + 1, 2)
-        addTextToParagraph(paragraph_duration, str(resources[i]['duration']), 22)
+    table = createTable(api, len(resources) + 1, 3)
+    fillTableHeaders(table, ['Name', 'Provider', 'Duration'], 22)
+    fillTableBody(table, resources, ['name', 'provider', 'duration'], 22)
     document.Call('Push', table)
 
     # FEEDBACK section
