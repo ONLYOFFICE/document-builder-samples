@@ -1,0 +1,66 @@
+{
+    "year": 2024,
+    "financials": {
+        "total_revenue": 5000000,
+        "total_expenses": 3000000,
+        "net_profit": 2000000,
+        "quarterly_data": [
+            {
+                "quarter": "Q1",
+                "revenue": 1200000,
+                "expenses": 800000,
+                "net_profit": 400000
+            },
+            {
+                "quarter": "Q2",
+                "revenue": 1300000,
+                "expenses": 700000,
+                "net_profit": 600000
+            },
+            {
+                "quarter": "Q3",
+                "revenue": 1100000,
+                "expenses": 900000,
+                "net_profit": 200000
+            },
+            {
+                "quarter": "Q4",
+                "revenue": 1400000,
+                "expenses": 600000,
+                "net_profit": 800000
+            }
+        ],
+        "r_d_expenses": 500000,
+        "marketing_expenses": 400000
+    },
+    "achievements": [
+        "Award: 'Best Software Developer 2024'",
+        "Launch of the new product 'TechPro'"
+    ],
+    "plans": {
+        "projects": [
+            {
+                "name": "Development of AI Service",
+                "deadline": "2025-12-31"
+            },
+            {
+                "name": "Upgrade of TechPro Platform",
+                "deadline": "2025-06-30"
+            }
+        ],
+        "financial_goals": [
+            {
+                "goal": "Revenue growth",
+                "value": "20%"
+            },
+            {
+                "goal": "Cost reduction",
+                "value": "10%"
+            }
+        ],
+        "marketing_initiatives": [
+            "Participation in 5 international exhibitions",
+            "Launch of an advertising campaign on platform X"
+        ]
+    }
+}
