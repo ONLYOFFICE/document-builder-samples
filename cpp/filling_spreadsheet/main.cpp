@@ -54,7 +54,7 @@ int main()
     CValue oGlobal = oContext.GetGlobal();
     CValue oApi = oGlobal["Api"];
 
-    // Find and comment formula errors
+    // Get current worksheet
     CValue oWorksheet = oApi.Call("GetActiveSheet");
 
     // Create CValue array from data
