@@ -1,0 +1,6 @@
+out/
+
+*.docx
+*.pptx
+*.xlsx
+*.class

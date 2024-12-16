@@ -1,0 +1,1 @@
+#define BUILDER_DIR L"[BUILDER_DIR]"
