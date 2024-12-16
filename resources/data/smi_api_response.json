@@ -1,0 +1,18 @@
+{
+    "social_trends": {
+        "positive_feedback": [
+            "eco-friendly",
+            "sustainability",
+            "green technology"
+        ],
+        "negative_feedback": [
+            "high cost",
+            "lack of awareness"
+        ]
+    },
+    "demographics": {
+        "age_range": "25-45",
+        "location": "Urban areas",
+        "income_level": "Middle to high-income"
+    }
+}

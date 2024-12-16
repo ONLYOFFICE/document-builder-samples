@@ -1,0 +1,22 @@
+{
+    "competitors": [
+        {
+            "name": "EcoTech Solutions",
+            "market_share": "15%",
+            "recent_funding": "10 million USD",
+            "products": [
+                "Eco-friendly Packaging",
+                "Sustainable Materials"
+            ]
+        },
+        {
+            "name": "GreenTech Innovations",
+            "market_share": "20%",
+            "recent_funding": "5 million USD",
+            "products": [
+                "Renewable Energy Systems",
+                "Solar Panels"
+            ]
+        }
+    ]
+}

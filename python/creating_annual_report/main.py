@@ -103,8 +103,8 @@ if __name__ == '__main__':
     # chart
     paragraph = api.Call('CreateParagraph')
     chart_names = ['revenue', 'expenses', 'net_profit']
-    chart_data = {key: [entry[key] for entry in data['financials']['quarterly_data']] for key in chart_names}
-    chart = api.Call('CreateChart', 'lineNormal', [chart_data['revenue'], chart_data['expenses'], chart_data['net_profit']], ['Revenue', 'Expenses', 'Net Profit'], ['Q1', 'Q2', 'Q3', 'Q4'])
+    chart_data = [[entry[key] for entry in data['financials']['quarterly_data']] for key in chart_names]
+    chart = api.Call('CreateChart', 'lineNormal', chart_data, ['Revenue', 'Expenses', 'Net Profit'], ['Q1', 'Q2', 'Q3', 'Q4'])
     chart.Call('SetSize', 170 * 36000, 90 * 36000)
     paragraph.Call('AddDrawing', chart)
     document.Call('Push', paragraph)
