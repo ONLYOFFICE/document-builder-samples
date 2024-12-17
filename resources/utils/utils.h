@@ -191,7 +191,179 @@ namespace NSUtils
 
 		return sOutput;
 	}
+
+	void GetUtf8StringFromUnicode_4bytes(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount, bool bIsBOM)
+	{
+		if (NULL == pData)
+		{
+			pData = new BYTE[6 * lCount + 3 + 1];
+		}
+
+		BYTE* pCodesCur = pData;
+		if (bIsBOM)
+		{
+			pCodesCur[0] = 0xEF;
+			pCodesCur[1] = 0xBB;
+			pCodesCur[2] = 0xBF;
+			pCodesCur += 3;
+		}
+
+		const wchar_t* pEnd = pUnicodes + lCount;
+		const wchar_t* pCur = pUnicodes;
+
+		while (pCur < pEnd)
+		{
+			unsigned int code = (unsigned int)*pCur++;
+
+			if (code < 0x80)
+			{
+				*pCodesCur++ = (BYTE)code;
+			}
+			else if (code < 0x0800)
+			{
+				*pCodesCur++ = 0xC0 | (code >> 6);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x10000)
+			{
+				*pCodesCur++ = 0xE0 | (code >> 12);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x1FFFFF)
+			{
+				*pCodesCur++ = 0xF0 | (code >> 18);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x3FFFFFF)
+			{
+				*pCodesCur++ = 0xF8 | (code >> 24);
+				*pCodesCur++ = 0x80 | (code >> 18 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x7FFFFFFF)
+			{
+				*pCodesCur++ = 0xFC | (code >> 30);
+				*pCodesCur++ = 0x80 | (code >> 24 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 18 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+		}
+
+		lOutputCount = (LONG)(pCodesCur - pData);
+		*pCodesCur++ = 0;
+	}
+
+	void GetUtf8StringFromUnicode_2bytes(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount, bool bIsBOM)
+	{
+		if (NULL == pData)
+		{
+			pData = new BYTE[6 * lCount + 3 + 1];
+		}
+
+		BYTE* pCodesCur = pData;
+		if (bIsBOM)
+		{
+			pCodesCur[0] = 0xEF;
+			pCodesCur[1] = 0xBB;
+			pCodesCur[2] = 0xBF;
+			pCodesCur += 3;
+		}
+
+		const wchar_t* pEnd = pUnicodes + lCount;
+		const wchar_t* pCur = pUnicodes;
+
+		while (pCur < pEnd)
+		{
+			unsigned int code = (unsigned int)*pCur++;
+			if (code >= 0xD800 && code <= 0xDFFF && pCur < pEnd)
+			{
+				code = 0x10000 + (((code & 0x3FF) << 10) | (0x03FF & *pCur++));
+			}
+
+			if (code < 0x80)
+			{
+				*pCodesCur++ = (BYTE)code;
+			}
+			else if (code < 0x0800)
+			{
+				*pCodesCur++ = 0xC0 | (code >> 6);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x10000)
+			{
+				*pCodesCur++ = 0xE0 | (code >> 12);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x1FFFFF)
+			{
+				*pCodesCur++ = 0xF0 | (code >> 18);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x3FFFFFF)
+			{
+				*pCodesCur++ = 0xF8 | (code >> 24);
+				*pCodesCur++ = 0x80 | ((code >> 18) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x7FFFFFFF)
+			{
+				*pCodesCur++ = 0xFC | (code >> 30);
+				*pCodesCur++ = 0x80 | ((code >> 24) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 18) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+		}
+
+		lOutputCount = (LONG)(pCodesCur - pData);
+		*pCodesCur++ = 0;
+	}
+
+	void GetUtf8StringFromUnicode(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount)
+	{
+		if (NULL == pUnicodes || 0 == lCount)
+		{
+			pData = NULL;
+			lOutputCount = 0;
+			return;
+		}
+
+		if (sizeof(WCHAR) == 2)
+			return GetUtf8StringFromUnicode_2bytes(pUnicodes, lCount, pData, lOutputCount, false);
+		return GetUtf8StringFromUnicode_4bytes(pUnicodes, lCount, pData, lOutputCount, false);
+	}
+
+	std::string GetUtf8StringFromUnicode(const wchar_t* pUnicodes, LONG lCount)
+	{
+		if (NULL == pUnicodes || 0 == lCount)
+			return "";
+
+		BYTE* pData = NULL;
+		LONG lLen = 0;
+
+		GetUtf8StringFromUnicode(pUnicodes, lCount, pData, lLen);
+
+		std::string s((char*)pData, lLen);
+
+		delete[] pData;
+		return s;
+	}
 }
+
+#define U_TO_UTF8(val) NSUtils::GetUtf8StringFromUnicode(val.c_str(), (LONG)val.length())
 
 namespace NSUtils
 {
