@@ -106,28 +106,6 @@ CValue createNumbering(CValue oApi, const json& data, string numberingType, int 
     return oParagraph;
 }
 
-CValue createStringArray(const vector<string>& values)
-{
-    CValue oArray = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
-    {
-        oArray[i] = values[i].c_str();
-    }
-
-    return oArray;
-}
-
-CValue createIntegerArray(const vector<int>& values)
-{
-    CValue oArray = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
-    {
-        oArray[i] = values[i];
-    }
-
-    return oArray;
-}
-
 // Main function
 int main()
 {

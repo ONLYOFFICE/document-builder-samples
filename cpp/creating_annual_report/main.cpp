@@ -108,24 +108,24 @@ CValue createNumbering(CValue oApi, const json& data, string numberingType, int 
 
 CValue createStringArray(const vector<string>& values)
 {
-    CValue oArray = CValue::CreateArray((int)values.size());
+    CValue arrResult = CValue::CreateArray((int)values.size());
     for (int i = 0; i < values.size(); i++)
     {
-        oArray[i] = values[i].c_str();
+        arrResult[i] = values[i].c_str();
     }
 
-    return oArray;
+    return arrResult;
 }
 
 CValue createIntegerArray(const vector<int>& values)
 {
-    CValue oArray = CValue::CreateArray((int)values.size());
+    CValue arrResult = CValue::CreateArray((int)values.size());
     for (int i = 0; i < values.size(); i++)
     {
-        oArray[i] = values[i];
+        arrResult[i] = values[i];
     }
 
-    return oArray;
+    return arrResult;
 }
 
 // Main function
@@ -163,18 +163,18 @@ int main()
     oParagraph = oApi.Call("CreateParagraph");
     vector<string> chartKeys = { "revenue", "expenses", "net_profit" };
     const json& quarterlyData = data["financials"]["quarterly_data"];
-    CValue oChartData = CValue::CreateArray((int)chartKeys.size());
+    CValue arrChartData = CValue::CreateArray((int)chartKeys.size());
     for (int i = 0; i < chartKeys.size(); i++)
     {
-        oChartData[i] = CValue::CreateArray((int)quarterlyData.size());
+        arrChartData[i] = CValue::CreateArray((int)quarterlyData.size());
         for (int j = 0; j < quarterlyData.size(); j++)
         {
-            oChartData[i][j] = quarterlyData[j][chartKeys[i]].get<int>();
+            arrChartData[i][j] = quarterlyData[j][chartKeys[i]].get<int>();
         }
     }
-    CValue oChartNames = createStringArray({ "Revenue", "Expenses", "Net Profit" });
-    CValue oHorValues = createStringArray({ "Q1", "Q2", "Q3", "Q4" });
-    CValue oChart = oApi.Call("CreateChart", "lineNormal", oChartData, oChartNames, oHorValues);
+    CValue arrChartNames = createStringArray({ "Revenue", "Expenses", "Net Profit" });
+    CValue arrHorValues = createStringArray({ "Q1", "Q2", "Q3", "Q4" });
+    CValue oChart = oApi.Call("CreateChart", "lineNormal", arrChartData, arrChartNames, arrHorValues);
     oChart.Call("SetSize", 170 * 36000, 90 * 36000);
     oParagraph.Call("AddDrawing", oChart);
     oDocument.Call("Push", oParagraph);
@@ -187,10 +187,10 @@ int main()
     int rdExpenses = data["financials"]["r_d_expenses"].get<int>();
     int marketingExpenses = data["financials"]["marketing_expenses"].get<int>();
     int totalExpenses = data["financials"]["total_expenses"];
-    oChartData = CValue::CreateArray(1);
-    oChartData[0] = createIntegerArray({ rdExpenses, marketingExpenses, totalExpenses - (rdExpenses + marketingExpenses) });
-    oChartNames = createStringArray({ "Research and Development", "Marketing", "Other" });
-    oChart = oApi.Call("CreateChart", "pie", oChartData, CValue::CreateArray(0), oChartNames);
+    arrChartData = CValue::CreateArray(1);
+    arrChartData[0] = createIntegerArray({ rdExpenses, marketingExpenses, totalExpenses - (rdExpenses + marketingExpenses) });
+    arrChartNames = createStringArray({ "Research and Development", "Marketing", "Other" });
+    oChart = oApi.Call("CreateChart", "pie", arrChartData, CValue::CreateArray(0), arrChartNames);
     oChart.Call("SetSize", 170 * 36000, 90 * 36000);
     oParagraph.Call("AddDrawing", oChart);
     oDocument.Call("Push", oParagraph);
