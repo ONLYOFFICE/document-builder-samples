@@ -47,19 +47,26 @@
 namespace NSUtils
 {
 #ifdef _WIN32
-	#define PATH_SEPARATOR '\\'
-	#define WriteCodepoint(code)							\
-	if (code < 0x10000)										\
-		*unicodes_cur++ = code;								\
-	else													\
-	{														\
-		code -= 0x10000;									\
-		*unicodes_cur++ = 0xD800 | ((code >> 10) & 0x03FF);	\
-		*unicodes_cur++ = 0xDC00 | (code & 0x03FF);			\
+	#define FILE_SEPARATOR '\\'
+	inline void WriteCodepoint(int code, wchar_t* unicodes_cur)
+	{
+		if (code < 0x10000)
+		{
+			*unicodes_cur++ = code;
+		}
+		else
+		{
+			code -= 0x10000;
+			*unicodes_cur++ = 0xD800 | ((code >> 10) & 0x03FF);
+			*unicodes_cur++ = 0xDC00 | (code & 0x03FF);
+		}
 	}
 #else
-	#define PATH_SEPARATOR '/'
-	#define WriteCodepoint(code) *unicodes_cur++ = (wchar_t)code;
+	#define FILE_SEPARATOR '/'
+	inline void WriteCodepoint(int code, wchar_t* unicodes_cur)
+	{
+		*unicodes_cur++ = (wchar_t)code;
+	}
 #endif
 
 	std::wstring GetStringFromUtf8(const unsigned char* utf8, size_t length)
@@ -74,7 +81,7 @@ namespace NSUtils
 			if (0x00 == (byteMain & 0x80))
 			{
 				// 1 byte
-				WriteCodepoint(byteMain)
+				WriteCodepoint(byteMain, unicodes_cur);
 				++index;
 			}
 			else if (0x00 == (byteMain & 0x20))
@@ -87,7 +94,7 @@ namespace NSUtils
 								(utf8[index + 1] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 2;
 			}
 			else if (0x00 == (byteMain & 0x10))
@@ -101,7 +108,7 @@ namespace NSUtils
 								(utf8[index + 2] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 3;
 			}
 			else if (0x00 == (byteMain & 0x0F))
@@ -116,7 +123,7 @@ namespace NSUtils
 								(utf8[index + 3] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 4;
 			}
 			else if (0x00 == (byteMain & 0x08))
@@ -131,7 +138,7 @@ namespace NSUtils
 								(utf8[index + 3] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 4;
 			}
 			else if (0x00 == (byteMain & 0x04))
@@ -147,7 +154,7 @@ namespace NSUtils
 								(utf8[index + 4] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 5;
 			}
 			else
@@ -164,7 +171,7 @@ namespace NSUtils
 								(utf8[index + 5] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 5;
 			}
 		}
@@ -379,7 +386,7 @@ namespace NSUtils
 	std::wstring GetProcessDirectory()
 	{
 		std::wstring path = GetProcessPath();
-		size_t pos = path.find_last_of(PATH_SEPARATOR);
+		size_t pos = path.find_last_of(FILE_SEPARATOR);
 		if (pos != std::wstring::npos)
 			path = path.substr(0, pos);
 		return path;
@@ -390,7 +397,7 @@ namespace NSUtils
 		std::wstring path = GetProcessDirectory();
 		while (!path.empty())
 		{
-			size_t pos = path.find_last_of(PATH_SEPARATOR);
+			size_t pos = path.find_last_of(FILE_SEPARATOR);
 			if (pos != std::wstring::npos)
 			{
 				std::wstring currDir = path.substr(pos + 1);
@@ -398,7 +405,7 @@ namespace NSUtils
 				path = path.substr(0, pos);
 				if (currDir == L"out")
 				{
-					path += PATH_SEPARATOR;
+					path += FILE_SEPARATOR;
 					path += L"resources";
 					break;
 				}
