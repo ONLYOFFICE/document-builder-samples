@@ -132,7 +132,7 @@ CValue createIntegerArray(const vector<int>& values)
 int main()
 {
     // parse JSON
-    string jsonPath = U_TO_UTF8(NSUtils::GetResourcesDirectory()) + "/data/financial_system_response.json";
+    string jsonPath = U_TO_UTF8(NSUtils::GetResourcesDirectory()) + "/data/hrms_response.json";
     ifstream fs(jsonPath);
     json data = json::parse(fs);
 
@@ -146,108 +146,99 @@ int main()
     CValue oApi = oGlobal["Api"];
     CValue oDocument = oApi.Call("GetDocument");
 
-    // DOCUMENT HEADER
+    // TITLE PAGE
+    // header
     CValue oParagraph = oDocument.Call("GetElement", 0);
-    addTextToParagraph(oParagraph, "Annual Report for " + to_string(data["year"].get<int>()), 44, true, "center");
+    addTextToParagraph(oParagraph, "Employee Development Plan for 2024", 48, true, "center");
+    oParagraph.Call("SetSpacingBefore", 5000);
+    oParagraph.Call("SetSpacingAfter", 500);
+    // employee name
+    oParagraph = oApi.Call("CreateParagraph");
+    addTextToParagraph(oParagraph, data["employee"]["name"].get<string>(), 36, false, "center");
+    oDocument.Call("Push", oParagraph);
+    // employee position and department
+    oParagraph = oApi.Call("CreateParagraph");
+    string employeeInfo = "Position: " + data["employee"]["position"].get<string>();
+    employeeInfo += "\nDepartment: " + data["employee"]["department"].get<string>();
+    addTextToParagraph(oParagraph, employeeInfo, 24, false, "center");
+    oParagraph.Call("AddPageBreak");
+    oDocument.Call("Push", oParagraph);
 
-    // FINANCIAL section
+    // COMPETENCIES SECION
     // header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Financial performance", 32, true);
+    addTextToParagraph(oParagraph, "Competencies", 32, true);
     oDocument.Call("Push", oParagraph);
-    // quarterly data
+    // technical skills sub-header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Quarterly data:", 24);
+    addTextToParagraph(oParagraph, "Technical skills:", 24);
     oDocument.Call("Push", oParagraph);
-    // chart
+    // technical skills table
+    const json& technicalSkills = data["competencies"]["technical_skills"];
+    CValue oTable = createTable(oApi, (int)technicalSkills.size() + 1, 2);
+    fillTableHeaders(oTable, { "Skill", "Level" }, 22);
+    fillTableBody(oTable, technicalSkills, { "name", "level" }, 22);
+    oDocument.Call("Push", oTable);
+    // soft skills sub-header
     oParagraph = oApi.Call("CreateParagraph");
-    vector<string> chartKeys = { "revenue", "expenses", "net_profit" };
-    const json& quarterlyData = data["financials"]["quarterly_data"];
-    CValue oChartData = CValue::CreateArray((int)chartKeys.size());
-    for (int i = 0; i < chartKeys.size(); i++)
-    {
-        oChartData[i] = CValue::CreateArray((int)quarterlyData.size());
-        for (int j = 0; j < quarterlyData.size(); j++)
-        {
-            oChartData[i][j] = quarterlyData[j][chartKeys[i]].get<int>();
-        }
-    }
-    CValue oChartNames = createStringArray({ "Revenue", "Expenses", "Net Profit" });
-    CValue oHorValues = createStringArray({ "Q1", "Q2", "Q3", "Q4" });
-    CValue oChart = oApi.Call("CreateChart", "lineNormal", oChartData, oChartNames, oHorValues);
-    oChart.Call("SetSize", 170 * 36000, 90 * 36000);
-    oParagraph.Call("AddDrawing", oChart);
+    addTextToParagraph(oParagraph, "Soft skills:", 24);
     oDocument.Call("Push", oParagraph);
-    // expenses
-    oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Expenses:", 24);
-    oDocument.Call("Push", oParagraph);
-    // pie chart
-    oParagraph = oApi.Call("CreateParagraph");
-    int rdExpenses = data["financials"]["r_d_expenses"].get<int>();
-    int marketingExpenses = data["financials"]["marketing_expenses"].get<int>();
-    int totalExpenses = data["financials"]["total_expenses"];
-    oChartData = CValue::CreateArray(1);
-    oChartData[0] = createIntegerArray({ rdExpenses, marketingExpenses, totalExpenses - (rdExpenses + marketingExpenses) });
-    oChartNames = createStringArray({ "Research and Development", "Marketing", "Other" });
-    oChart = oApi.Call("CreateChart", "pie", oChartData, CValue::CreateArray(0), oChartNames);
-    oChart.Call("SetSize", 170 * 36000, 90 * 36000);
-    oParagraph.Call("AddDrawing", oChart);
-    oDocument.Call("Push", oParagraph);
-    // year totals
-    oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Year total numbers:", 24);
-    oDocument.Call("Push", oParagraph);
-    // table
-    CValue oTable = createTable(oApi, 2, 3);
-    fillTableHeaders(oTable, { "Total revenue", "Total expenses", "Total net profit" }, 22);
-    oParagraph = getTableCellParagraph(oTable, 1, 0);
-    addTextToParagraph(oParagraph, to_string(data["financials"]["total_revenue"].get<int>()), 22);
-    oParagraph = getTableCellParagraph(oTable, 1, 1);
-    addTextToParagraph(oParagraph, to_string(data["financials"]["total_expenses"].get<int>()), 22);
-    oParagraph = getTableCellParagraph(oTable, 1, 2);
-    addTextToParagraph(oParagraph, to_string(data["financials"]["net_profit"].get<int>()), 22);
+    // soft skills table
+    const json& softSkills = data["competencies"]["soft_skills"];
+    oTable = createTable(oApi, (int)softSkills.size() + 1, 2);
+    fillTableHeaders(oTable, { "Skill", "Level" }, 22);
+    fillTableBody(oTable, softSkills, { "name", "level" }, 22);
     oDocument.Call("Push", oTable);
 
-    // ACHIEVEMENTS section
+    // DEVELOPMENT AREAS section
     // header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Achievements this year", 32, true);
+    addTextToParagraph(oParagraph, "Development areas", 32, true);
     oDocument.Call("Push", oParagraph);
     // list
-    createNumbering(oApi, data["achievements"], "numbered", 22);
+    createNumbering(oApi, data["development_areas"], "numbered", 22);
 
-    // PLANS section
+    // GOALS section
     // header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Plans for the next year", 32, true);
+    addTextToParagraph(oParagraph, "Goals for next year", 32, true);
     oDocument.Call("Push", oParagraph);
-    // projects
+    // numbering
+    oParagraph = createNumbering(oApi, data["goals_next_year"], "numbered", 22);
+    // add a page break after the last paragraph
+    oParagraph.Call("AddPageBreak");
+
+    // RESOURCES section
+    // header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Projects:", 24);
+    addTextToParagraph(oParagraph, "Recommended resources", 32, true);
     oDocument.Call("Push", oParagraph);
     // table
-    const json& projects = data["plans"]["projects"];
-    oTable = createTable(oApi, (int)projects.size() + 1, 2);
-    fillTableHeaders(oTable, { "Name", "Deadline" }, 22);
-    fillTableBody(oTable, projects, { "name", "deadline" }, 22);
+    const json& resources = data["resources"];
+    oTable = createTable(oApi, (int)resources.size() + 1, 3);
+    fillTableHeaders(oTable, { "Name", "Provider", "Duration" }, 22);
+    fillTableBody(oTable, resources, { "name", "provider", "duration" }, 22);
     oDocument.Call("Push", oTable);
-    // financial goals
+
+    // FEEDBACK section
+    // header
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Financial goals:", 24);
+    addTextToParagraph(oParagraph, "Feedback", 32, true);
     oDocument.Call("Push", oParagraph);
-    // table
-    const json& goals = data["plans"]["financial_goals"];
-    oTable = createTable(oApi, (int)goals.size() + 1, 2);
-    fillTableHeaders(oTable, { "Goal", "Value" }, 22);
-    fillTableBody(oTable, goals, { "goal", "value" }, 22);
-    oDocument.Call("Push", oTable);
-    // marketing initiatives
+    // manager"s feedback
     oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Marketing initiatives:", 24);
+    addTextToParagraph(oParagraph, "Manager's feedback:", 24, false);
     oDocument.Call("Push", oParagraph);
-    // list
-    createNumbering(oApi, data["plans"]["marketing_initiatives"], "bullet", 22);
+    oParagraph = oApi.Call("CreateParagraph");
+    addTextToParagraph(oParagraph, string(280, '_'), 24, false);
+    oDocument.Call("Push", oParagraph);
+    // employees"s feedback
+    oParagraph = oApi.Call("CreateParagraph");
+    addTextToParagraph(oParagraph, "Employee's feedback:", 24, false);
+    oDocument.Call("Push", oParagraph);
+    oParagraph = oApi.Call("CreateParagraph");
+    addTextToParagraph(oParagraph, string(280, '_'), 24, false);
+    oDocument.Call("Push", oParagraph);
 
     // save and close
     oBuilder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX, resultPath);
