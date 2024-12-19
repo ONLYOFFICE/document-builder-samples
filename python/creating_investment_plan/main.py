@@ -53,7 +53,7 @@ if __name__ == '__main__':
     # fill remaining cells
     start_cell = worksheet.Call('GetRangeByNumber', 2, 1)
     end_cell = worksheet.Call('GetRangeByNumber', term + 1, 1)
-    worksheet.Call('GetRange', start_cell, end_cell).Call('SetValue', [['=$B$2*POWER((1+0.12),A%d)' % (i + 1)] for i in range(2, term + 2)])
+    worksheet.Call('GetRange', start_cell, end_cell).Call('SetValue', [['=$B$2*POWER((1+%f),A%d)' % (rate, (i + 1))] for i in range(2, term + 2)])
 
     # create chart
     chart = worksheet.Call('AddChart', 'Sheet1!$A$1:$B$%d' % (term + 2), False, 'lineNormal', 2, 135.38 * 36000, 81.28 * 36000)

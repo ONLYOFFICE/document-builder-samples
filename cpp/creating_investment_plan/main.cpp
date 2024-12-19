@@ -88,7 +88,7 @@ int main()
     vector<string> amounts(term);
     for (int year = 0; year < term; year++)
     {
-        amounts[year] = "=$B$2*POWER((1+0.12),A" + to_string(year + 3) + ")";
+        amounts[year] = "=$B$2*POWER((1+" + to_string(rate) + "),A" + to_string(year + 3) + ")";
     }
     oWorksheet.Call("GetRange", oStartCell, oEndCell).Call("SetValue", createColumnData(amounts));
 

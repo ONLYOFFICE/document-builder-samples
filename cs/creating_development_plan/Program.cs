@@ -152,7 +152,7 @@ namespace Sample
             addTextToParagraph(oParagraph, new string('_', 280), 24, false);
             oDocument.Call("Push", oParagraph);
 
-            // Save file and close DocBuilder
+            // save and close
             oBuilder.SaveFile(doctype, resultPath);
             oBuilder.CloseFile();
             CDocBuilder.Destroy();

@@ -163,7 +163,7 @@ namespace Sample
             // list
             createNumbering(oApi, data.plans.marketing_initiatives, "bullet", 22);
 
-            // Save file and close DocBuilder
+            // save and close
             oBuilder.SaveFile(doctype, resultPath);
             oBuilder.CloseFile();
             CDocBuilder.Destroy();
