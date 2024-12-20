@@ -102,17 +102,6 @@ CValue createStringArray(const vector<string>& values)
     return arrResult;
 }
 
-CValue createIntegerArray(const vector<int>& values)
-{
-    CValue arrResult = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
-    {
-        arrResult[i] = values[i];
-    }
-
-    return arrResult;
-}
-
 // Main function
 int main()
 {
@@ -342,7 +331,7 @@ int main()
     // chart
     vector<string> chartKeys = { "revenue", "cost_of_goods_sold", "gross_profit", "operating_expenses", "net_profit" };
     const json& profitForecast = data["profit_forecast"];
-    CValue arrChartYears = CValue::CreateArray((int)data["profit_forecast"].size());
+    CValue arrChartYears = CValue::CreateArray((int)profitForecast.size());
     for (int i = 0; i < profitForecast.size(); i++)
     {
         arrChartYears[i] = profitForecast[i]["year"].get<string>().c_str();
@@ -385,19 +374,22 @@ int main()
     double variableCostPerUnit = stod(separateValueAndUnit(data["break_even_analysis"]["variable_cost_per_unit"].get<string>()).first);
     int breakEvenPoint = data["break_even_analysis"]["break_even_point"].get<int>();
     int step = breakEvenPoint / 4;
-    vector<int> chartUnits(9), chartRevenue(9), chartTotalCosts(9);
+    CValue chartUnits = oContext.CreateArray(9);
+    CValue chartRevenue = oContext.CreateArray(9);
+    CValue chartTotalCosts = oContext.CreateArray(9);
     for (int i = 0; i < 9; i++)
     {
-        chartUnits[i] = i * step;
-        chartRevenue[i] = (int)(chartUnits[i] * sellingPricePerUnit);
-        chartTotalCosts[i] = (int)(fixedCosts + chartUnits[i] * variableCostPerUnit);
+        int currUnits = i * step;
+        chartUnits[i] = currUnits;
+        chartRevenue[i] = (int)(currUnits * sellingPricePerUnit);
+        chartTotalCosts[i] = (int)(fixedCosts + currUnits * variableCostPerUnit);
     }
     arrChartData = CValue::CreateArray(2);
-    arrChartData[0] = createIntegerArray(chartRevenue);
-    arrChartData[1] = createIntegerArray(chartTotalCosts);
+    arrChartData[0] = chartRevenue;
+    arrChartData[1] = chartTotalCosts;
     arrChartNames = createStringArray({ "Revenue", "Total costs" });
     // create chart
-    oChart = oApi.Call("CreateChart", "lineNormal", arrChartData, arrChartNames, createIntegerArray(chartUnits));
+    oChart = oApi.Call("CreateChart", "lineNormal", arrChartData, arrChartNames, chartUnits);
     setChartSizes(oChart, 9.17, 5.06, 0.31, 2);
     verAxisTitle = "Amount (" + moneyUnit + ")";
     oChart.Call("SetVerAxisTitle", verAxisTitle.c_str(), 14, false);
