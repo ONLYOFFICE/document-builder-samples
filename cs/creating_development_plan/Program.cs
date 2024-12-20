@@ -39,10 +39,10 @@ namespace Sample
             // add Docbuilder dlls in path
             System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + workDirectory);
 
-            CreateAnnualReport(workDirectory, resultPath, resourcesDir);
+            CreateDevelopmentPlan(workDirectory, resultPath, resourcesDir);
         }
 
-        public static void CreateAnnualReport(string workDirectory, string resultPath, string resourcesDir)
+        public static void CreateDevelopmentPlan(string workDirectory, string resultPath, string resourcesDir)
         {
             // parse JSON
             string json_path = resourcesDir + "/data/hrms_response.json";

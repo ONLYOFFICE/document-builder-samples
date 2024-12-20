@@ -40,10 +40,10 @@ namespace Sample
             // add Docbuilder dlls in path
             System.Environment.SetEnvironmentVariable("PATH", System.Environment.GetEnvironmentVariable("PATH") + ";" + workDirectory);
 
-            CreateAnnualReport(workDirectory, resultPath, resourcesDir);
+            CreateStartupPresentation(workDirectory, resultPath, resourcesDir);
         }
 
-        public static void CreateAnnualReport(string workDirectory, string resultPath, string resourcesDir)
+        public static void CreateStartupPresentation(string workDirectory, string resultPath, string resourcesDir)
         {
             // init docbuilder and create new pptx file
             var doctype = (int)OfficeFileTypes.Presentation.PPTX;
