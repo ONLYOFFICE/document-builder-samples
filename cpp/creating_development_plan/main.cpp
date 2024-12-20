@@ -203,14 +203,14 @@ int main()
     oParagraph = oApi.Call("CreateParagraph");
     addTextToParagraph(oParagraph, "Feedback", 32, true);
     oDocument.Call("Push", oParagraph);
-    // manager"s feedback
+    // manager's feedback
     oParagraph = oApi.Call("CreateParagraph");
     addTextToParagraph(oParagraph, "Manager's feedback:", 24, false);
     oDocument.Call("Push", oParagraph);
     oParagraph = oApi.Call("CreateParagraph");
     addTextToParagraph(oParagraph, string(280, '_'), 24, false);
     oDocument.Call("Push", oParagraph);
-    // employees"s feedback
+    // employees's feedback
     oParagraph = oApi.Call("CreateParagraph");
     addTextToParagraph(oParagraph, "Employee's feedback:", 24, false);
     oDocument.Call("Push", oParagraph);

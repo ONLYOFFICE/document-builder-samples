@@ -137,14 +137,14 @@ namespace Sample
             paragraph = api.Call("CreateParagraph");
             AddTextToParagraph(paragraph, "Feedback", 32, true);
             document.Call("Push", paragraph);
-            // manager"s feedback
+            // manager's feedback
             paragraph = api.Call("CreateParagraph");
             AddTextToParagraph(paragraph, "Manager's feedback:", 24, false);
             document.Call("Push", paragraph);
             paragraph = api.Call("CreateParagraph");
             AddTextToParagraph(paragraph, new string('_', 280), 24, false);
             document.Call("Push", paragraph);
-            // employees"s feedback
+            // employees's feedback
             paragraph = api.Call("CreateParagraph");
             AddTextToParagraph(paragraph, "Employee's feedback:", 24, false);
             document.Call("Push", paragraph);
