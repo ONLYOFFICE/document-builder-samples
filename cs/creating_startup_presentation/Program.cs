@@ -439,7 +439,7 @@ namespace Sample
     public class MarketOverviewData
     {
         public MarketData market { get; set; }
-}
+    }
 
     public class MarketData
     {
