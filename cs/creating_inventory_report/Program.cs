@@ -30,7 +30,7 @@ namespace Sample
 {
     public class CreatingPresentation
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.xlsx";
@@ -45,56 +45,56 @@ namespace Sample
         public static void CreateInventoryReport(string workDirectory, string resultPath, string resourcesDir)
         {
             // parse JSON
-            string json_path = resourcesDir + "/data/ims_response.json";
-            string json = File.ReadAllText(json_path);
+            string jsonPath = resourcesDir + "/data/ims_response.json";
+            string json = File.ReadAllText(jsonPath);
             InventoryData data = JsonSerializer.Deserialize<InventoryData>(json);
 
             // init docbuilder and create new xlsx file
             var doctype = (int)OfficeFileTypes.Spreadsheet.XLSX;
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
-            oBuilder.CreateFile(doctype);
+            CDocBuilder builder = new();
+            builder.CreateFile(doctype);
 
-            CContext oContext = oBuilder.GetContext();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
-            CValue oWorksheet = oApi.Call("GetActiveSheet");
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
+            CValue worksheet = api.Call("GetActiveSheet");
 
             // fill table headers
-            oWorksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Item");
-            oWorksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Quantity");
-            oWorksheet.Call("GetRangeByNumber", 0, 2).Call("SetValue", "Status");
+            worksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Item");
+            worksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Quantity");
+            worksheet.Call("GetRangeByNumber", 0, 2).Call("SetValue", "Status");
             // make headers bold
-            CValue oStartCell = oWorksheet.Call("GetRangeByNumber", 0, 0);
-            CValue oEndCell = oWorksheet.Call("GetRangeByNumber", 0, 2);
-            oWorksheet.Call("GetRange", oStartCell, oEndCell).Call("SetBold", true);
+            CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
+            CValue endCell = worksheet.Call("GetRangeByNumber", 0, 2);
+            worksheet.Call("GetRange", startCell, endCell).Call("SetBold", true);
             // fill table data
             var inventory = data.inventory;
             for (int i = 0; i < inventory.Count; i++)
             {
                 ItemData entry = inventory[i];
-                CValue oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 0);
-                oCell.Call("SetValue", entry.item);
-                oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 1);
-                oCell.Call("SetValue", entry.quantity);
-                oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 2);
+                CValue cell = worksheet.Call("GetRangeByNumber", i + 1, 0);
+                cell.Call("SetValue", entry.item);
+                cell = worksheet.Call("GetRangeByNumber", i + 1, 1);
+                cell.Call("SetValue", entry.quantity);
+                cell = worksheet.Call("GetRangeByNumber", i + 1, 2);
                 string status = entry.status;
-                oCell.Call("SetValue", status);
+                cell.Call("SetValue", status);
                 // fill cell with color corresponding to status
                 if (status == "In Stock")
-                    oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 0, 194, 87));
+                    cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 0, 194, 87));
                 else if (status == "Reserved")
-                    oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 255, 255, 0));
+                    cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 255, 255, 0));
                 else
-                    oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 255, 79, 79));
+                    cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 255, 79, 79));
             }
             // tweak cells width
-            oWorksheet.Call("GetRange", "A1").Call("SetColumnWidth", 40);
-            oWorksheet.Call("GetRange", "C1").Call("SetColumnWidth", 15);
+            worksheet.Call("GetRange", "A1").Call("SetColumnWidth", 40);
+            worksheet.Call("GetRange", "C1").Call("SetColumnWidth", 15);
 
             // save and close
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
             CDocBuilder.Destroy();
         }
     }

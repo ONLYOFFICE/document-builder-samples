@@ -30,7 +30,7 @@ namespace Sample
 {
     public class CreatingPresentation
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.docx";
@@ -45,196 +45,198 @@ namespace Sample
         public static void CreateAnnualReport(string workDirectory, string resultPath, string resourcesDir)
         {
             // parse JSON
-            string json_path = resourcesDir + "/data/financial_system_response.json";
-            string json = File.ReadAllText(json_path);
+            string jsonPath = resourcesDir + "/data/financial_system_response.json";
+            string json = File.ReadAllText(jsonPath);
             YearData data = JsonSerializer.Deserialize<YearData>(json);
 
             // init docbuilder and create new docx file
             var doctype = (int)OfficeFileTypes.Document.DOCX;
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
-            oBuilder.CreateFile(doctype);
+            CDocBuilder builder = new();
+            builder.CreateFile(doctype);
 
-            CContext oContext = oBuilder.GetContext();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
-            CValue oDocument = oApi.Call("GetDocument");
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
+            CValue document = api.Call("GetDocument");
 
             // DOCUMENT HEADER
-            CValue oParagraph = oDocument.Call("GetElement", 0);
-            addTextToParagraph(oParagraph, $"Annual Report for {data.year}", 44, true, "center");
+            CValue paragraph = document.Call("GetElement", 0);
+            AddTextToParagraph(paragraph, $"Annual Report for {data.year}", 44, true, "center");
 
             // FINANCIAL section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Financial performance", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Financial performance", 32, true);
+            document.Call("Push", paragraph);
             // quarterly data
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Quarterly data:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Quarterly data:", 24);
+            document.Call("Push", paragraph);
             // chart
-            oParagraph = oApi.Call("CreateParagraph");
+            paragraph = api.Call("CreateParagraph");
             string[] chartKeys = { "revenue", "expenses", "net_profit" };
             var quarterlyData = data.financials.quarterly_data;
-            CValue[] arrChartData = new CValue[chartKeys.Length];
+            CValue[] chartData = new CValue[chartKeys.Length];
             for (int i = 0; i < chartKeys.Length; i++)
             {
-                arrChartData[i] = oContext.CreateArray(quarterlyData.Count);
+                chartData[i] = context.CreateArray(quarterlyData.Count);
                 for (int j = 0; j < quarterlyData.Count; j++)
                 {
-                    arrChartData[i][j] = (int)quarterlyData[j].GetType().GetProperty(chartKeys[i]).GetValue(quarterlyData[j]);
+                    chartData[i][j] = (int)quarterlyData[j].GetType().GetProperty(chartKeys[i]).GetValue(quarterlyData[j]);
                 }
             }
-            CValue[] arrChartNames = { "Revenue", "Expenses", "Net Profit" };
-            CValue[] arrHorValues = { "Q1", "Q2", "Q3", "Q4" };
-            CValue oChart = oApi.Call("CreateChart", "lineNormal", arrChartData, arrChartNames, arrHorValues);
-            oChart.Call("SetSize", 170 * 36000, 90 * 36000);
-            oParagraph.Call("AddDrawing", oChart);
-            oDocument.Call("Push", oParagraph);
+            CValue[] chartNames = { "Revenue", "Expenses", "Net Profit" };
+            CValue[] horValues = { "Q1", "Q2", "Q3", "Q4" };
+            CValue chart = api.Call("CreateChart", "lineNormal", chartData, chartNames, horValues);
+            chart.Call("SetSize", 170 * 36000, 90 * 36000);
+            paragraph.Call("AddDrawing", chart);
+            document.Call("Push", paragraph);
             // expenses
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Expenses:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Expenses:", 24);
+            document.Call("Push", paragraph);
             // pie chart
-            oParagraph = oApi.Call("CreateParagraph");
+            paragraph = api.Call("CreateParagraph");
             int rdExpenses = data.financials.r_d_expenses;
             int marketingExpenses = data.financials.marketing_expenses;
             int totalExpenses = data.financials.total_expenses;
-            arrChartData = new CValue[1];
-            arrChartData[0] = new CValue[] { rdExpenses, marketingExpenses, totalExpenses - (rdExpenses + marketingExpenses) };
-            arrChartNames = new CValue[] { "Research and Development", "Marketing", "Other" };
-            oChart = oApi.Call("CreateChart", "pie", arrChartData, oContext.CreateArray(0), arrChartNames);
-            oChart.Call("SetSize", 170 * 36000, 90 * 36000);
-            oParagraph.Call("AddDrawing", oChart);
-            oDocument.Call("Push", oParagraph);
+            chartData = new CValue[1];
+            chartData[0] = new CValue[] { rdExpenses, marketingExpenses, totalExpenses - (rdExpenses + marketingExpenses) };
+            chartNames = new CValue[] { "Research and Development", "Marketing", "Other" };
+            chart = api.Call("CreateChart", "pie", chartData, context.CreateArray(0), chartNames);
+            chart.Call("SetSize", 170 * 36000, 90 * 36000);
+            paragraph.Call("AddDrawing", chart);
+            document.Call("Push", paragraph);
             // year totals
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Year total numbers:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Year total numbers:", 24);
+            document.Call("Push", paragraph);
             // table
-            CValue oTable = createTable(oApi, 2, 3);
-            fillTableHeaders(oTable, new string[] { "Total revenue", "Total expenses", "Total net profit" }, 22);
-            oParagraph = getTableCellParagraph(oTable, 1, 0);
-            addTextToParagraph(oParagraph, $"{data.financials.total_revenue}", 22);
-            oParagraph = getTableCellParagraph(oTable, 1, 1);
-            addTextToParagraph(oParagraph, $"{data.financials.total_expenses}", 22);
-            oParagraph = getTableCellParagraph(oTable, 1, 2);
-            addTextToParagraph(oParagraph, $"{data.financials.net_profit}", 22);
-            oDocument.Call("Push", oTable);
+            CValue table = CreateTable(api, 2, 3);
+            FillTableHeaders(table, new string[] { "Total revenue", "Total expenses", "Total net profit" }, 22);
+            paragraph = GetTableCellParagraph(table, 1, 0);
+            AddTextToParagraph(paragraph, data.financials.total_revenue.ToString(), 22);
+            paragraph = GetTableCellParagraph(table, 1, 1);
+            AddTextToParagraph(paragraph, data.financials.total_expenses.ToString(), 22);
+            paragraph = GetTableCellParagraph(table, 1, 2);
+            AddTextToParagraph(paragraph, data.financials.net_profit.ToString(), 22);
+            document.Call("Push", table);
 
             // ACHIEVEMENTS section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Achievements this year", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Achievements this year", 32, true);
+            document.Call("Push", paragraph);
             // list
-            createNumbering(oApi, data.achievements, "numbered", 22);
+            CreateNumbering(api, data.achievements, "numbered", 22);
 
             // PLANS section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Plans for the next year", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Plans for the next year", 32, true);
+            document.Call("Push", paragraph);
             // projects
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Projects:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Projects:", 24);
+            document.Call("Push", paragraph);
             // table
             var projects = data.plans.projects;
-            oTable = createTable(oApi, projects.Count + 1, 2);
-            fillTableHeaders(oTable, new string[] { "Name", "Deadline" }, 22);
-            fillTableBody(oTable, projects, new string[] { "name", "deadline" }, 22);
-            oDocument.Call("Push", oTable);
+            table = CreateTable(api, projects.Count + 1, 2);
+            FillTableHeaders(table, new string[] { "Name", "Deadline" }, 22);
+            FillTableBody(table, projects, new string[] { "name", "deadline" }, 22);
+            document.Call("Push", table);
             // financial goals
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Financial goals:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Financial goals:", 24);
+            document.Call("Push", paragraph);
             // table
             var goals = data.plans.financial_goals;
-            oTable = createTable(oApi, goals.Count + 1, 2);
-            fillTableHeaders(oTable, new string[] { "Goal", "Value" }, 22);
-            fillTableBody(oTable, goals, new string[] { "goal", "value" }, 22);
-            oDocument.Call("Push", oTable);
+            table = CreateTable(api, goals.Count + 1, 2);
+            FillTableHeaders(table, new string[] { "Goal", "Value" }, 22);
+            FillTableBody(table, goals, new string[] { "goal", "value" }, 22);
+            document.Call("Push", table);
             // marketing initiatives
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Marketing initiatives:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Marketing initiatives:", 24);
+            document.Call("Push", paragraph);
             // list
-            createNumbering(oApi, data.plans.marketing_initiatives, "bullet", 22);
+            CreateNumbering(api, data.plans.marketing_initiatives, "bullet", 22);
 
             // save and close
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
             CDocBuilder.Destroy();
         }
 
-        public static void addTextToParagraph(CValue oParagraph, string text, int fontSize, bool isBold = false, string jc = "left")
+        public static void AddTextToParagraph(CValue paragraph, string text, int fontSize, bool isBold = false, string jc = "left")
         {
-            oParagraph.Call("AddText", text);
-            oParagraph.Call("SetFontSize", fontSize);
-            oParagraph.Call("SetBold", isBold);
-            oParagraph.Call("SetJc", jc);
-        }
-        public static CValue createTable(CValue oApi, int rows, int cols, int borderColor = 200)
-        {
-            // create table
-            CValue oTable = oApi.Call("CreateTable", cols, rows);
-            // set table properties;
-            oTable.Call("SetWidth", "percent", 100);
-            oTable.Call("SetTableCellMarginTop", 200);
-            oTable.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245);
-            // set table borders;
-            oTable.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
-            return oTable;
-        }
-        public static CValue getTableCellParagraph(CValue oTable, int row, int col)
-        {
-            return oTable.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
+            paragraph.Call("AddText", text);
+            paragraph.Call("SetFontSize", fontSize);
+            paragraph.Call("SetBold", isBold);
+            paragraph.Call("SetJc", jc);
         }
 
-        public static void fillTableHeaders(CValue oTable, string[] data, int fontSize)
+        public static CValue CreateTable(CValue api, int rows, int cols, int borderColor = 200)
+        {
+            // create table
+            CValue table = api.Call("CreateTable", cols, rows);
+            // set table properties;
+            table.Call("SetWidth", "percent", 100);
+            table.Call("SetTableCellMarginTop", 200);
+            table.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245);
+            // set table borders;
+            table.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
+            return table;
+        }
+
+        public static CValue GetTableCellParagraph(CValue table, int row, int col)
+        {
+            return table.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
+        }
+
+        public static void FillTableHeaders(CValue table, string[] data, int fontSize)
         {
             for (int i = 0; i < data.Length; i++)
             {
-                CValue oParagraph = getTableCellParagraph(oTable, 0, i);
-                addTextToParagraph(oParagraph, data[i], fontSize, true);
+                CValue paragraph = GetTableCellParagraph(table, 0, i);
+                AddTextToParagraph(paragraph, data[i], fontSize, true);
             }
         }
 
-        public static void fillTableBody<T>(CValue oTable, List<T> data, string[] keys, int fontSize, int startRow = 1)
+        public static void FillTableBody<T>(CValue table, List<T> data, string[] keys, int fontSize, int startRow = 1)
         {
             for (int row = 0; row < data.Count; row++)
             {
                 for (int col = 0; col < keys.Length; col++)
                 {
-                    CValue oParagraph = getTableCellParagraph(oTable, row + startRow, col);
-                    addTextToParagraph(oParagraph, (string)data[row].GetType().GetProperty(keys[col]).GetValue(data[row]), fontSize);
+                    CValue paragraph = GetTableCellParagraph(table, row + startRow, col);
+                    AddTextToParagraph(paragraph, (string)data[row].GetType().GetProperty(keys[col]).GetValue(data[row]), fontSize);
                 }
             }
         }
 
-        public static CValue createNumbering(CValue oApi, List<string> data, string numberingType, int fontSize)
+        public static CValue CreateNumbering(CValue api, List<string> data, string numberingType, int fontSize)
         {
-            CValue oDocument = oApi.Call("GetDocument");
-            CValue oNumbering = oDocument.Call("CreateNumbering", numberingType);
-            CValue oNumberingLevel = oNumbering.Call("GetLevel", 0);
+            CValue document = api.Call("GetDocument");
+            CValue numbering = document.Call("CreateNumbering", numberingType);
+            CValue numberingLevel = numbering.Call("GetLevel", 0);
 
-            CValue oParagraph = CValue.CreateUndefined();
+            CValue paragraph = CValue.CreateUndefined();
             foreach (string entry in data)
             {
-                oParagraph = oApi.Call("CreateParagraph");
-                oParagraph.Call("SetNumbering", oNumberingLevel);
-                addTextToParagraph(oParagraph, entry, fontSize);
-                oDocument.Call("Push", oParagraph);
+                paragraph = api.Call("CreateParagraph");
+                paragraph.Call("SetNumbering", numberingLevel);
+                AddTextToParagraph(paragraph, entry, fontSize);
+                document.Call("Push", paragraph);
             }
-            // return the last oParagraph in numbering
-            return oParagraph;
+            // return the last paragraph in numbering
+            return paragraph;
         }
     }
 

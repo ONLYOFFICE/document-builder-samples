@@ -30,7 +30,7 @@ namespace Sample
 {
     public class CreatingPresentation
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.docx";
@@ -45,185 +45,185 @@ namespace Sample
         public static void CreateDevelopmentPlan(string workDirectory, string resultPath, string resourcesDir)
         {
             // parse JSON
-            string json_path = resourcesDir + "/data/hrms_response.json";
-            string json = File.ReadAllText(json_path);
+            string jsonPath = resourcesDir + "/data/hrms_response.json";
+            string json = File.ReadAllText(jsonPath);
             EmployeeData data = JsonSerializer.Deserialize<EmployeeData>(json);
 
             // init docbuilder and create new docx file
             var doctype = (int)OfficeFileTypes.Document.DOCX;
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
-            oBuilder.CreateFile(doctype);
+            CDocBuilder builder = new();
+            builder.CreateFile(doctype);
 
-            CContext oContext = oBuilder.GetContext();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
-            CValue oDocument = oApi.Call("GetDocument");
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
+            CValue document = api.Call("GetDocument");
 
             // TITLE PAGE
             // header
-            CValue oParagraph = oDocument.Call("GetElement", 0);
-            addTextToParagraph(oParagraph, "Employee Development Plan for 2024", 48, true, "center");
-            oParagraph.Call("SetSpacingBefore", 5000);
-            oParagraph.Call("SetSpacingAfter", 500);
+            CValue paragraph = document.Call("GetElement", 0);
+            AddTextToParagraph(paragraph, "Employee Development Plan for 2024", 48, true, "center");
+            paragraph.Call("SetSpacingBefore", 5000);
+            paragraph.Call("SetSpacingAfter", 500);
             // employee name
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, data.employee.name, 36, false, "center");
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, data.employee.name, 36, false, "center");
+            document.Call("Push", paragraph);
             // employee position and department
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, $"Position: {data.employee.position}\nDepartment: {data.employee.department}", 24, false, "center");
-            oParagraph.Call("AddPageBreak");
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, $"Position: {data.employee.position}\nDepartment: {data.employee.department}", 24, false, "center");
+            paragraph.Call("AddPageBreak");
+            document.Call("Push", paragraph);
 
             // COMPETENCIES SECION
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Competencies", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Competencies", 32, true);
+            document.Call("Push", paragraph);
             // technical skills sub-header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Technical skills:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Technical skills:", 24);
+            document.Call("Push", paragraph);
             // technical skills table
             var technicalSkills = data.competencies.technical_skills;
-            CValue oTable = createTable(oApi, technicalSkills.Count + 1, 2);
-            fillTableHeaders(oTable, new string[] { "Skill", "Level" }, 22);
-            fillTableBody(oTable, technicalSkills, new string[] { "name", "level" }, 22);
-            oDocument.Call("Push", oTable);
+            CValue table = CreateTable(api, technicalSkills.Count + 1, 2);
+            FillTableHeaders(table, new string[] { "Skill", "Level" }, 22);
+            FillTableBody(table, technicalSkills, new string[] { "name", "level" }, 22);
+            document.Call("Push", table);
             // soft skills sub-header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Soft skills:", 24);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Soft skills:", 24);
+            document.Call("Push", paragraph);
             // soft skills table
             var softSkills = data.competencies.soft_skills;
-            oTable = createTable(oApi, softSkills.Count + 1, 2);
-            fillTableHeaders(oTable, new string[] { "Skill", "Level" }, 22);
-            fillTableBody(oTable, softSkills, new string[] { "name", "level" }, 22);
-            oDocument.Call("Push", oTable);
+            table = CreateTable(api, softSkills.Count + 1, 2);
+            FillTableHeaders(table, new string[] { "Skill", "Level" }, 22);
+            FillTableBody(table, softSkills, new string[] { "name", "level" }, 22);
+            document.Call("Push", table);
 
             // DEVELOPMENT AREAS section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Development areas", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Development areas", 32, true);
+            document.Call("Push", paragraph);
             // list
-            createNumbering(oApi, data.development_areas, "numbered", 22);
+            CreateNumbering(api, data.development_areas, "numbered", 22);
 
             // GOALS section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Goals for next year", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Goals for next year", 32, true);
+            document.Call("Push", paragraph);
             // numbering
-            oParagraph = createNumbering(oApi, data.goals_next_year, "numbered", 22);
+            paragraph = CreateNumbering(api, data.goals_next_year, "numbered", 22);
             // add a page break after the last paragraph
-            oParagraph.Call("AddPageBreak");
+            paragraph.Call("AddPageBreak");
 
             // RESOURCES section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Recommended resources", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Recommended resources", 32, true);
+            document.Call("Push", paragraph);
             // table
             var resources = data.resources;
-            oTable = createTable(oApi, resources.Count + 1, 3);
-            fillTableHeaders(oTable, new string[] { "Name", "Provider", "Duration" }, 22);
-            fillTableBody(oTable, resources, new string[] { "name", "provider", "duration" }, 22);
-            oDocument.Call("Push", oTable);
+            table = CreateTable(api, resources.Count + 1, 3);
+            FillTableHeaders(table, new string[] { "Name", "Provider", "Duration" }, 22);
+            FillTableBody(table, resources, new string[] { "name", "provider", "duration" }, 22);
+            document.Call("Push", table);
 
             // FEEDBACK section
             // header
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Feedback", 32, true);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Feedback", 32, true);
+            document.Call("Push", paragraph);
             // manager"s feedback
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Manager's feedback:", 24, false);
-            oDocument.Call("Push", oParagraph);
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, new string('_', 280), 24, false);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Manager's feedback:", 24, false);
+            document.Call("Push", paragraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, new string('_', 280), 24, false);
+            document.Call("Push", paragraph);
             // employees"s feedback
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, "Employee's feedback:", 24, false);
-            oDocument.Call("Push", oParagraph);
-            oParagraph = oApi.Call("CreateParagraph");
-            addTextToParagraph(oParagraph, new string('_', 280), 24, false);
-            oDocument.Call("Push", oParagraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, "Employee's feedback:", 24, false);
+            document.Call("Push", paragraph);
+            paragraph = api.Call("CreateParagraph");
+            AddTextToParagraph(paragraph, new string('_', 280), 24, false);
+            document.Call("Push", paragraph);
 
             // save and close
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
             CDocBuilder.Destroy();
         }
 
-        public static void addTextToParagraph(CValue oParagraph, string text, int fontSize, bool isBold = false, string jc = "left")
+        public static void AddTextToParagraph(CValue paragraph, string text, int fontSize, bool isBold = false, string jc = "left")
         {
-            oParagraph.Call("AddText", text);
-            oParagraph.Call("SetFontSize", fontSize);
-            oParagraph.Call("SetBold", isBold);
-            oParagraph.Call("SetJc", jc);
+            paragraph.Call("AddText", text);
+            paragraph.Call("SetFontSize", fontSize);
+            paragraph.Call("SetBold", isBold);
+            paragraph.Call("SetJc", jc);
         }
-        public static CValue createTable(CValue oApi, int rows, int cols, int borderColor = 200)
+        public static CValue CreateTable(CValue api, int rows, int cols, int borderColor = 200)
         {
             // create table
-            CValue oTable = oApi.Call("CreateTable", cols, rows);
+            CValue table = api.Call("CreateTable", cols, rows);
             // set table properties;
-            oTable.Call("SetWidth", "percent", 100);
-            oTable.Call("SetTableCellMarginTop", 200);
-            oTable.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245);
+            table.Call("SetWidth", "percent", 100);
+            table.Call("SetTableCellMarginTop", 200);
+            table.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245);
             // set table borders;
-            oTable.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
-            oTable.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
-            return oTable;
+            table.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
+            table.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
+            return table;
         }
-        public static CValue getTableCellParagraph(CValue oTable, int row, int col)
+        public static CValue GetTableCellParagraph(CValue table, int row, int col)
         {
-            return oTable.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
+            return table.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
         }
 
-        public static void fillTableHeaders(CValue oTable, string[] data, int fontSize)
+        public static void FillTableHeaders(CValue table, string[] data, int fontSize)
         {
             for (int i = 0; i < data.Length; i++)
             {
-                CValue oParagraph = getTableCellParagraph(oTable, 0, i);
-                addTextToParagraph(oParagraph, data[i], fontSize, true);
+                CValue paragraph = GetTableCellParagraph(table, 0, i);
+                AddTextToParagraph(paragraph, data[i], fontSize, true);
             }
         }
 
-        public static void fillTableBody<T>(CValue oTable, List<T> data, string[] keys, int fontSize, int startRow = 1)
+        public static void FillTableBody<T>(CValue table, List<T> data, string[] keys, int fontSize, int startRow = 1)
         {
             for (int row = 0; row < data.Count; row++)
             {
                 for (int col = 0; col < keys.Length; col++)
                 {
-                    CValue oParagraph = getTableCellParagraph(oTable, row + startRow, col);
-                    addTextToParagraph(oParagraph, (string)data[row].GetType().GetProperty(keys[col]).GetValue(data[row]), fontSize);
+                    CValue paragraph = GetTableCellParagraph(table, row + startRow, col);
+                    AddTextToParagraph(paragraph, (string)data[row].GetType().GetProperty(keys[col]).GetValue(data[row]), fontSize);
                 }
             }
         }
 
-        public static CValue createNumbering(CValue oApi, List<string> data, string numberingType, int fontSize)
+        public static CValue CreateNumbering(CValue api, List<string> data, string numberingType, int fontSize)
         {
-            CValue oDocument = oApi.Call("GetDocument");
-            CValue oNumbering = oDocument.Call("CreateNumbering", numberingType);
-            CValue oNumberingLevel = oNumbering.Call("GetLevel", 0);
+            CValue document = api.Call("GetDocument");
+            CValue numbering = document.Call("CreateNumbering", numberingType);
+            CValue numberingLevel = numbering.Call("GetLevel", 0);
 
-            CValue oParagraph = CValue.CreateUndefined();
+            CValue paragraph = CValue.CreateUndefined();
             foreach (string entry in data)
             {
-                oParagraph = oApi.Call("CreateParagraph");
-                oParagraph.Call("SetNumbering", oNumberingLevel);
-                addTextToParagraph(oParagraph, entry, fontSize);
-                oDocument.Call("Push", oParagraph);
+                paragraph = api.Call("CreateParagraph");
+                paragraph.Call("SetNumbering", numberingLevel);
+                AddTextToParagraph(paragraph, entry, fontSize);
+                document.Call("Push", paragraph);
             }
-            // return the last oParagraph in numbering
-            return oParagraph;
+            // return the last paragraph in numbering
+            return paragraph;
         }
     }
 
