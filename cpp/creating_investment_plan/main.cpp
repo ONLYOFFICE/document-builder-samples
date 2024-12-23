@@ -57,13 +57,13 @@ int main()
 
     // init docbuilder and create new xlsx file
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
+    CDocBuilder builder;
+    builder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
 
-    CContext oContext = oBuilder.GetContext();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
-    CValue oWorksheet = oApi.Call("GetActiveSheet");
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
+    CValue worksheet = api.Call("GetActiveSheet");
 
     // initialize financial data from JSON
     int initAmount = data["initial_amount"].get<int>();
@@ -71,44 +71,44 @@ int main()
     int term = data["term"].get<int>();
 
     // fill years
-    CValue oStartCell = oWorksheet.Call("GetRangeByNumber", 1, 0);
-    CValue oEndCell = oWorksheet.Call("GetRangeByNumber", term + 1, 0);
-    vector<string> years(term + 1);
+    CValue startCell = worksheet.Call("GetRangeByNumber", 1, 0);
+    CValue endCell = worksheet.Call("GetRangeByNumber", term + 1, 0);
+    vector<string> years((size_t)term + 1);
     for (int year = 0; year <= term; year++)
     {
         years[year] = to_string(year);
     }
-    oWorksheet.Call("GetRange", oStartCell, oEndCell).Call("SetValue", createColumnData(years));
+    worksheet.Call("GetRange", startCell, endCell).Call("SetValue", createColumnData(years));
 
     // fill initial amount
-    oWorksheet.Call("GetRangeByNumber", 1, 1).Call("SetValue", initAmount);
+    worksheet.Call("GetRangeByNumber", 1, 1).Call("SetValue", initAmount);
     // fill remaining cells
-    oStartCell = oWorksheet.Call("GetRangeByNumber", 2, 1);
-    oEndCell = oWorksheet.Call("GetRangeByNumber", term + 1, 1);
+    startCell = worksheet.Call("GetRangeByNumber", 2, 1);
+    endCell = worksheet.Call("GetRangeByNumber", term + 1, 1);
     vector<string> amounts(term);
     for (int year = 0; year < term; year++)
     {
         amounts[year] = "=$B$2*POWER((1+" + to_string(rate) + "),A" + to_string(year + 3) + ")";
     }
-    oWorksheet.Call("GetRange", oStartCell, oEndCell).Call("SetValue", createColumnData(amounts));
+    worksheet.Call("GetRange", startCell, endCell).Call("SetValue", createColumnData(amounts));
 
     // create chart
     string chartDataRange = "Sheet1!$A$1:$B$" + to_string(term + 2);
-    CValue oChart = oWorksheet.Call("AddChart", chartDataRange.c_str(), false, "lineNormal", 2, 135.38 * 36000, 81.28 * 36000);
-    oChart.Call("SetPosition", 3, 0, 2, 0);
-    oChart.Call("SetTitle", "Capital Growth Over Time", 22);
-    CValue oColor = oApi.Call("CreateRGBColor", 134, 134, 134);
-    CValue oFill = oApi.Call("CreateSolidFill", oColor);
-    CValue oStroke = oApi.Call("CreateStroke", 1, oFill);
-    oChart.Call("SetMinorVerticalGridlines", oStroke);
-    oChart.Call("SetMajorHorizontalGridlines", oStroke);
+    CValue chart = worksheet.Call("AddChart", chartDataRange.c_str(), false, "lineNormal", 2, 135.38 * 36000, 81.28 * 36000);
+    chart.Call("SetPosition", 3, 0, 2, 0);
+    chart.Call("SetTitle", "Capital Growth Over Time", 22);
+    CValue color = api.Call("CreateRGBColor", 134, 134, 134);
+    CValue fill = api.Call("CreateSolidFill", color);
+    CValue stroke = api.Call("CreateStroke", 1, fill);
+    chart.Call("SetMinorVerticalGridlines", stroke);
+    chart.Call("SetMajorHorizontalGridlines", stroke);
     // fill table headers
-    oWorksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Year");
-    oWorksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Amount");
+    worksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Year");
+    worksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Amount");
 
     // save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

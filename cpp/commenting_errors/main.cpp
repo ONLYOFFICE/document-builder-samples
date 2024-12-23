@@ -30,12 +30,12 @@ const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.xlsx";
 
 // Helper functions
-void CheckCell(CValue oWorksheet, wstring cell, int row, int col)
+void CheckCell(CValue worksheet, wstring cell, int row, int col)
 {
     if (cell.find('#') != std::wstring::npos)
     {
         wstring commentMsg = L"Error: " + cell;
-        CValue errorCell = oWorksheet.Call("GetRangeByNumber", row, col);
+        CValue errorCell = worksheet.Call("GetRangeByNumber", row, col);
         errorCell.Call("AddComment", commentMsg.c_str());
     }
 }
@@ -45,33 +45,31 @@ int main()
 {
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.SetProperty("--work-directory", workDir);
+    CDocBuilder builder;
 
     // Open file and get context
     wstring templatePath = NSUtils::GetResourcesDirectory() + L"/docs/spreadsheet_with_errors.xlsx";
-    oBuilder.OpenFile(templatePath.c_str(), L"");
-    CContext oContext = oBuilder.GetContext();
-    CContextScope oScope = oContext.CreateScope();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
+    builder.OpenFile(templatePath.c_str(), L"");
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
 
     // Find and comment formula errors
-    CValue oWorksheet = oApi.Call("GetActiveSheet");
-    CValue oRange = oWorksheet.Call("GetUsedRange");
-    CValue data = oRange.Call("GetValue");
+    CValue worksheet = api.Call("GetActiveSheet");
+    CValue range = worksheet.Call("GetUsedRange");
+    CValue data = range.Call("GetValue");
 
     for (int row = 0; row < (int)data.GetLength(); row++)
     {
         for (int col = 0; col < (int)data[0].GetLength(); col++)
         {
-            CheckCell(oWorksheet, data[row][col].ToString().c_str(), row, col);
+            CheckCell(worksheet, data[row][col].ToString().c_str(), row, col);
         }
     }
 
     // Save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

@@ -43,49 +43,49 @@ int main()
 
     // init docbuilder and create new xlsx file
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
+    CDocBuilder builder;
+    builder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
 
-    CContext oContext = oBuilder.GetContext();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
-    CValue oWorksheet = oApi.Call("GetActiveSheet");
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
+    CValue worksheet = api.Call("GetActiveSheet");
 
     // fill table headers
-    oWorksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Item");
-    oWorksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Quantity");
-    oWorksheet.Call("GetRangeByNumber", 0, 2).Call("SetValue", "Status");
+    worksheet.Call("GetRangeByNumber", 0, 0).Call("SetValue", "Item");
+    worksheet.Call("GetRangeByNumber", 0, 1).Call("SetValue", "Quantity");
+    worksheet.Call("GetRangeByNumber", 0, 2).Call("SetValue", "Status");
     // make headers bold
-    CValue oStartCell = oWorksheet.Call("GetRangeByNumber", 0, 0);
-    CValue oEndCell = oWorksheet.Call("GetRangeByNumber", 0, 2);
-    oWorksheet.Call("GetRange", oStartCell, oEndCell).Call("SetBold", true);
+    CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
+    CValue endCell = worksheet.Call("GetRangeByNumber", 0, 2);
+    worksheet.Call("GetRange", startCell, endCell).Call("SetBold", true);
     // fill table data
     const json& inventory = data["inventory"];
     for (int i = 0; i < inventory.size(); i++)
     {
         const json& entry = inventory[i];
-        CValue oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 0);
-        oCell.Call("SetValue", entry["item"].get<string>().c_str());
-        oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 1);
-        oCell.Call("SetValue", to_string(entry["quantity"].get<int>()).c_str());
-        oCell = oWorksheet.Call("GetRangeByNumber", i + 1, 2);
+        CValue cell = worksheet.Call("GetRangeByNumber", i + 1, 0);
+        cell.Call("SetValue", entry["item"].get<string>().c_str());
+        cell = worksheet.Call("GetRangeByNumber", i + 1, 1);
+        cell.Call("SetValue", to_string(entry["quantity"].get<int>()).c_str());
+        cell = worksheet.Call("GetRangeByNumber", i + 1, 2);
         string status = entry["status"].get<string>();
-        oCell.Call("SetValue", status.c_str());
+        cell.Call("SetValue", status.c_str());
         // fill cell with color corresponding to status
         if (status == "In Stock")
-            oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 0, 194, 87));
+            cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 0, 194, 87));
         else if (status == "Reserved")
-            oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 255, 255, 0));
+            cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 255, 255, 0));
         else
-            oCell.Call("SetFillColor", oApi.Call("CreateColorFromRGB", 255, 79, 79));
+            cell.Call("SetFillColor", api.Call("CreateColorFromRGB", 255, 79, 79));
     }
     // tweak cells width
-    oWorksheet.Call("GetRange", "A1").Call("SetColumnWidth", 40);
-    oWorksheet.Call("GetRange", "C1").Call("SetColumnWidth", 15);
+    worksheet.Call("GetRange", "A1").Call("SetColumnWidth", 40);
+    worksheet.Call("GetRange", "C1").Call("SetColumnWidth", 15);
 
     // save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

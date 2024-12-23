@@ -30,18 +30,18 @@ using namespace NSDoctRenderer;
 const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.pptx";
 
-void addText(CValue oApi, int fontSize, string text, CValue oSlide, CValue oShape, CValue oParagraph, CValue oFill, string jc)
+void addText(CValue api, int fontSize, string text, CValue slide, CValue shape, CValue paragraph, CValue fill, string jc)
 {
-    CValue oRun = oApi.Call("CreateRun");
-    CValue oTextPr = oRun.Call("GetTextPr");
-    oTextPr.Call("SetFontSize", fontSize);
-    oTextPr.Call("SetFill", oFill);
-    oTextPr.Call("SetFontFamily", "Tahoma");
-    oParagraph.Call("SetJc", jc.c_str());
-    oRun.Call("AddText", text.c_str());
-    oRun.Call("AddLineBreak");
-    oParagraph.Call("AddElement", oRun);
-    oSlide.Call("AddObject", oShape);
+    CValue run = api.Call("CreateRun");
+    CValue textPr = run.Call("GetTextPr");
+    textPr.Call("SetFontSize", fontSize);
+    textPr.Call("SetFill", fill);
+    textPr.Call("SetFontFamily", "Tahoma");
+    paragraph.Call("SetJc", jc.c_str());
+    run.Call("AddText", text.c_str());
+    run.Call("AddLineBreak");
+    paragraph.Call("AddElement", run);
+    slide.Call("AddObject", shape);
 }
 
 // Main function
@@ -49,18 +49,16 @@ int main()
 {
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.SetProperty("--work-directory", workDir);
+    CDocBuilder builder;
 
     // Read chart data from xlsx
     wstring templatePath = NSUtils::GetResourcesDirectory() + L"/docs/chart_data.xlsx";
-    oBuilder.OpenFile(templatePath.c_str(), L"");
-    CContext oContext = oBuilder.GetContext();
-    CContextScope oScope = oContext.CreateScope();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
-    CValue oWorksheet = oApi.Call("GetActiveSheet");
-    CValue values = oWorksheet.Call("GetUsedRange").Call("GetValue");
+    builder.OpenFile(templatePath.c_str(), L"");
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
+    CValue worksheet = api.Call("GetActiveSheet");
+    CValue values = worksheet.Call("GetUsedRange").Call("GetValue");
 
     int sizeX = values.GetLength();
     int sizeY = values[0].GetLength();
@@ -72,54 +70,53 @@ int main()
             data[i][j] = values[i][j].ToString().c_str();
         }
     }
-    oBuilder.CloseFile();
+    builder.CloseFile();
 
     // Create chart presentation
-    oBuilder.CreateFile(OFFICESTUDIO_FILE_PRESENTATION_PPTX);
-    oContext = oBuilder.GetContext();
-    oScope = oContext.CreateScope();
-    oGlobal = oContext.GetGlobal();
-    oApi = oGlobal["Api"];
-    CValue oPresentation = oApi.Call("GetPresentation");
-    CValue oSlide = oPresentation.Call("GetSlideByIndex", 0);
-    oSlide.Call("RemoveAllObjects");
+    builder.CreateFile(OFFICESTUDIO_FILE_PRESENTATION_PPTX);
+    context = builder.GetContext();
+    global = context.GetGlobal();
+    api = global["Api"];
+    CValue presentation = api.Call("GetPresentation");
+    CValue slide = presentation.Call("GetSlideByIndex", 0);
+    slide.Call("RemoveAllObjects");
 
-    CValue oRGBColor = oApi.Call("CreateRGBColor", 255, 244, 240);
-    CValue oFill = oApi.Call("CreateSolidFill", oRGBColor);
-    oSlide.Call("SetBackground", oFill);
+    CValue rGBColor = api.Call("CreateRGBColor", 255, 244, 240);
+    CValue fill = api.Call("CreateSolidFill", rGBColor);
+    slide.Call("SetBackground", fill);
 
-    CValue oStroke = oApi.Call("CreateStroke", 0, oApi.Call("CreateNoFill"));
-    CValue oShapeTitle = oApi.Call("CreateShape", "rect", 300 * 36000, 20 * 36000, oApi.Call("CreateNoFill"), oStroke);
-    CValue oShapeText = oApi.Call("CreateShape", "rect", 120 * 36000, 80 * 36000, oApi.Call("CreateNoFill"), oStroke);
-    oShapeTitle.Call("SetPosition", 20 * 36000, 20 * 36000);
-    oShapeText.Call("SetPosition", 210 * 36000, 50 * 36000);
-    CValue oParagraphTitle = oShapeTitle.Call("GetDocContent").Call("GetElement", 0);
-    CValue oParagraphText = oShapeText.Call("GetDocContent").Call("GetElement", 0);
-    oRGBColor = oApi.Call("CreateRGBColor", 115, 81, 68);
-    oFill = oApi.Call("CreateSolidFill", oRGBColor);
+    CValue stroke = api.Call("CreateStroke", 0, api.Call("CreateNoFill"));
+    CValue shapeTitle = api.Call("CreateShape", "rect", 300 * 36000, 20 * 36000, api.Call("CreateNoFill"), stroke);
+    CValue shapeText = api.Call("CreateShape", "rect", 120 * 36000, 80 * 36000, api.Call("CreateNoFill"), stroke);
+    shapeTitle.Call("SetPosition", 20 * 36000, 20 * 36000);
+    shapeText.Call("SetPosition", 210 * 36000, 50 * 36000);
+    CValue paragraphTitle = shapeTitle.Call("GetDocContent").Call("GetElement", 0);
+    CValue paragraphText = shapeText.Call("GetDocContent").Call("GetElement", 0);
+    rGBColor = api.Call("CreateRGBColor", 115, 81, 68);
+    fill = api.Call("CreateSolidFill", rGBColor);
 
     string titleContent = "Price Type Report";
     string textContent = "This is an overview of price types. As we can see, May was the price peak, but even in June the price went down, the annual upward trend persists.";
-    addText(oApi, 80, titleContent, oSlide, oShapeTitle, oParagraphTitle, oFill, "center");
-    addText(oApi, 42, textContent, oSlide, oShapeText, oParagraphText, oFill, "left");
+    addText(api, 80, titleContent, slide, shapeTitle, paragraphTitle, fill, "center");
+    addText(api, 42, textContent, slide, shapeText, paragraphText, fill, "left");
 
     // Transform 2d array into cols names, rows names and data
-    CValue cols = oContext.CreateArray(sizeY - 1);
+    CValue cols = context.CreateArray(sizeY - 1);
     for (int col = 1; col < sizeY; col++)
     {
         cols[col - 1] = data[0][col].c_str();
     }
 
-    CValue rows = oContext.CreateArray(sizeX - 1);
+    CValue rows = context.CreateArray(sizeX - 1);
     for (int row = 1; row < sizeX; row++)
     {
         rows[row - 1] = data[row][0].c_str();
     }
 
-    CValue vals = oContext.CreateArray(sizeY - 1);
+    CValue vals = context.CreateArray(sizeY - 1);
     for (int row = 1; row < sizeY; row++)
     {
-        CValue row_data = oContext.CreateArray(sizeX - 1);
+        CValue row_data = context.CreateArray(sizeX - 1);
         for (int col = 1; col < sizeX; col++)
         {
             row_data[col - 1] = data[col][row].c_str();
@@ -128,17 +125,17 @@ int main()
     }
 
     // Pass CValue data to the CreateChart method
-    CValue oChart = oApi.Call("CreateChart", "lineStacked", vals, cols, rows);
-    oChart.Call("SetSize", 180 * 36000, 100 * 36000);
-    oChart.Call("SetPosition", 20 * 36000, 50 * 36000);
-    oChart.Call("ApplyChartStyle", 24);
-    oChart.Call("SetLegendFontSize", 12);
-    oChart.Call("SetLegendPos", "top");
-    oSlide.Call("AddObject", oChart);
+    CValue chart = api.Call("CreateChart", "lineStacked", vals, cols, rows);
+    chart.Call("SetSize", 180 * 36000, 100 * 36000);
+    chart.Call("SetPosition", 20 * 36000, 50 * 36000);
+    chart.Call("ApplyChartStyle", 24);
+    chart.Call("SetLegendFontSize", 12);
+    chart.Call("SetLegendPos", "top");
+    slide.Call("AddObject", chart);
 
     // Save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_PRESENTATION_PPTX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_PRESENTATION_PPTX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

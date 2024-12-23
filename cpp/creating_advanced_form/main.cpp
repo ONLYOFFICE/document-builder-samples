@@ -29,70 +29,70 @@ const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.docx";
 
 // Helper functions
-void setTableBorders(CValue oTable, int borderColor)
+void setTableBorders(CValue table, int borderColor)
 {
-    oTable.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
-    oTable.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
-    oTable.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
-    oTable.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
-    oTable.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
-    oTable.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderTop", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderBottom", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderLeft", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderRight", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderInsideV", "single", 4, 0, borderColor, borderColor, borderColor);
+    table.Call("SetTableBorderInsideH", "single", 4, 0, borderColor, borderColor, borderColor);
 }
 
-CValue createFullWidthTable(CValue oApi, int rows, int cols, int borderColor)
+CValue createFullWidthTable(CValue api, int rows, int cols, int borderColor)
 {
-    CValue oTable = oApi.Call("CreateTable", cols, rows);
-    oTable.Call("SetWidth", "percent", 100);
-    setTableBorders(oTable, borderColor);
-    return oTable;
+    CValue table = api.Call("CreateTable", cols, rows);
+    table.Call("SetWidth", "percent", 100);
+    setTableBorders(table, borderColor);
+    return table;
 }
 
-CValue getTableCellParagraph(CValue oTable, int row, int col)
+CValue getTableCellParagraph(CValue table, int row, int col)
 {
-    return oTable.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
+    return table.Call("GetCell", row, col).Call("GetContent").Call("GetElement", 0);
 }
 
-void addTextToParagraph(CValue oParagraph, std::string text, int fontSize, bool isBold)
+void addTextToParagraph(CValue paragraph, std::string text, int fontSize, bool isBold)
 {
-    oParagraph.Call("AddText", text.c_str());
-    oParagraph.Call("SetFontSize", fontSize);
-    oParagraph.Call("SetBold", isBold);
+    paragraph.Call("AddText", text.c_str());
+    paragraph.Call("SetFontSize", fontSize);
+    paragraph.Call("SetBold", isBold);
 }
 
-void setPictureFormProperties(CValue oPictureForm, std::string key, std::string tip, bool required, std::string placeholder, std::string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
+void setPictureFormProperties(CValue pictureForm, std::string key, std::string tip, bool required, std::string placeholder, std::string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
 {
-    oPictureForm.Call("SetFormKey", key.c_str());
-    oPictureForm.Call("SetTipText", tip.c_str());
-    oPictureForm.Call("SetRequired", required);
-    oPictureForm.Call("SetPlaceholderText", placeholder.c_str());
-    oPictureForm.Call("SetScaleFlag", scaleFlag.c_str());
-    oPictureForm.Call("SetLockAspectRatio", lockAspectRatio);
-    oPictureForm.Call("SetRespectBorders", respectBorders);
-    oPictureForm.Call("SetPicturePosition", shiftX, shiftY);
+    pictureForm.Call("SetFormKey", key.c_str());
+    pictureForm.Call("SetTipText", tip.c_str());
+    pictureForm.Call("SetRequired", required);
+    pictureForm.Call("SetPlaceholderText", placeholder.c_str());
+    pictureForm.Call("SetScaleFlag", scaleFlag.c_str());
+    pictureForm.Call("SetLockAspectRatio", lockAspectRatio);
+    pictureForm.Call("SetRespectBorders", respectBorders);
+    pictureForm.Call("SetPicturePosition", shiftX, shiftY);
 }
 
-void setTextFormProperties(CValue oTextForm, string key, string tip, bool required, string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)
+void setTextFormProperties(CValue textForm, string key, string tip, bool required, string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)
 {
-    oTextForm.Call("SetFormKey", key.c_str());
-    oTextForm.Call("SetTipText", tip.c_str());
-    oTextForm.Call("SetRequired", required);
-    oTextForm.Call("SetPlaceholderText", placeholder.c_str());
-    oTextForm.Call("SetComb", comb);
-    oTextForm.Call("SetCharactersLimit", maxCharacters);
-    oTextForm.Call("SetCellWidth", cellWidth);
-    oTextForm.Call("SetCellWidth", multiLine);
-    oTextForm.Call("SetMultiline", autoFit);
+    textForm.Call("SetFormKey", key.c_str());
+    textForm.Call("SetTipText", tip.c_str());
+    textForm.Call("SetRequired", required);
+    textForm.Call("SetPlaceholderText", placeholder.c_str());
+    textForm.Call("SetComb", comb);
+    textForm.Call("SetCharactersLimit", maxCharacters);
+    textForm.Call("SetCellWidth", cellWidth);
+    textForm.Call("SetCellWidth", multiLine);
+    textForm.Call("SetMultiline", autoFit);
 }
 
-void addTextFormToParagraph(CValue oParagraph, CValue oTextForm, int fontSize, string jc, bool hasBorder, int borderColor)
+void addTextFormToParagraph(CValue paragraph, CValue textForm, int fontSize, string jc, bool hasBorder, int borderColor)
 {
     if (hasBorder)
     {
-        oTextForm.Call("SetBorderColor", borderColor, borderColor, borderColor);
+        textForm.Call("SetBorderColor", borderColor, borderColor, borderColor);
     }
-    oParagraph.Call("AddElement", oTextForm);
-    oParagraph.Call("SetFontSize", fontSize);
-    oParagraph.Call("SetJc", jc.c_str());
+    paragraph.Call("AddElement", textForm);
+    paragraph.Call("SetFontSize", fontSize);
+    paragraph.Call("SetJc", jc.c_str());
 }
 
 // Main function
@@ -100,86 +100,84 @@ int main()
 {
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.SetProperty("--work-directory", workDir);
-    oBuilder.CreateFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX);
+    CDocBuilder builder;
+    builder.CreateFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX);
 
-    CContext oContext = oBuilder.GetContext();
-    CContextScope oScope = oContext.CreateScope();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
 
     // Create advanced form
-    CValue oDocument = oApi.Call("GetDocument");
-    CValue oTable = createFullWidthTable(oApi, 1, 2, 255);
-    CValue oParagraph = getTableCellParagraph(oTable, 0, 0);
-    addTextToParagraph(oParagraph, "PURCHASE ORDER", 36, true);
-    oParagraph = getTableCellParagraph(oTable, 0, 1);
-    addTextToParagraph(oParagraph, "Serial # ", 25, true);
+    CValue document = api.Call("GetDocument");
+    CValue table = createFullWidthTable(api, 1, 2, 255);
+    CValue paragraph = getTableCellParagraph(table, 0, 0);
+    addTextToParagraph(paragraph, "PURCHASE ORDER", 36, true);
+    paragraph = getTableCellParagraph(table, 0, 1);
+    addTextToParagraph(paragraph, "Serial # ", 25, true);
 
-    CValue oTextForm = oApi.Call("CreateTextForm");
-    setTextFormProperties(oTextForm, "Serial", "Enter serial number", false, "Serial", true, 6, 1, false, false);
-    addTextFormToParagraph(oParagraph, oTextForm, 25, "left", true, 255);
-    oDocument.Call("Push", oTable);
+    CValue textForm = api.Call("CreateTextForm");
+    setTextFormProperties(textForm, "Serial", "Enter serial number", false, "Serial", true, 6, 1, false, false);
+    addTextFormToParagraph(paragraph, textForm, 25, "left", true, 255);
+    document.Call("Push", table);
 
-    CValue oPictureForm = oApi.Call("CreatePictureForm");
-    setPictureFormProperties(oPictureForm, "Photo", "Upload company logo", false, "Photo", "tooBig", false, false, 0, 0);
-    oParagraph = oApi.Call("CreateParagraph");
-    oParagraph.Call("AddElement", oPictureForm);
-    oDocument.Call("Push", oParagraph);
+    CValue pictureForm = api.Call("CreatePictureForm");
+    setPictureFormProperties(pictureForm, "Photo", "Upload company logo", false, "Photo", "tooBig", false, false, 0, 0);
+    paragraph = api.Call("CreateParagraph");
+    paragraph.Call("AddElement", pictureForm);
+    document.Call("Push", paragraph);
 
-    oTextForm = oApi.Call("CreateTextForm");
-    setTextFormProperties(oTextForm, "Company Name", "Enter company name", false, "Company Name", true, 20, 1, false, false);
-    oParagraph = oApi.Call("CreateParagraph");
-    addTextFormToParagraph(oParagraph, oTextForm, 35, "left", false, 255);
-    oDocument.Call("Push", oParagraph);
+    textForm = api.Call("CreateTextForm");
+    setTextFormProperties(textForm, "Company Name", "Enter company name", false, "Company Name", true, 20, 1, false, false);
+    paragraph = api.Call("CreateParagraph");
+    addTextFormToParagraph(paragraph, textForm, 35, "left", false, 255);
+    document.Call("Push", paragraph);
 
-    oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "Date: ", 25, true);
-    oTextForm = oApi.Call("CreateTextForm");
-    setTextFormProperties(oTextForm, "Date", "Date", false, "DD.MM.YYYY", true, 10, 1, false, false);
-    addTextFormToParagraph(oParagraph, oTextForm, 25, "left", true, 255);
-    oDocument.Call("Push", oParagraph);
+    paragraph = api.Call("CreateParagraph");
+    addTextToParagraph(paragraph, "Date: ", 25, true);
+    textForm = api.Call("CreateTextForm");
+    setTextFormProperties(textForm, "Date", "Date", false, "DD.MM.YYYY", true, 10, 1, false, false);
+    addTextFormToParagraph(paragraph, textForm, 25, "left", true, 255);
+    document.Call("Push", paragraph);
 
-    oParagraph = oApi.Call("CreateParagraph");
-    addTextToParagraph(oParagraph, "To:", 35, true);
-    oDocument.Call("Push", oParagraph);
+    paragraph = api.Call("CreateParagraph");
+    addTextToParagraph(paragraph, "To:", 35, true);
+    document.Call("Push", paragraph);
 
-    oTable = createFullWidthTable(oApi, 1, 1, 200);
-    oParagraph = getTableCellParagraph(oTable, 0, 0);
-    oTextForm = oApi.Call("CreateTextForm");
-    setTextFormProperties(oTextForm, "Recipient", "Recipient", false, "Recipient", true, 25, 1, false, false);
-    addTextFormToParagraph(oParagraph, oTextForm, 32, "left", false, 255);
-    oDocument.Call("Push", oTable);
+    table = createFullWidthTable(api, 1, 1, 200);
+    paragraph = getTableCellParagraph(table, 0, 0);
+    textForm = api.Call("CreateTextForm");
+    setTextFormProperties(textForm, "Recipient", "Recipient", false, "Recipient", true, 25, 1, false, false);
+    addTextFormToParagraph(paragraph, textForm, 32, "left", false, 255);
+    document.Call("Push", table);
 
-    oTable = createFullWidthTable(oApi, 10, 2, 200);
-    oTable.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245, false);
-    CValue oCell = oTable.Call("GetCell", 0, 0);
-    oCell.Call("SetWidth", "percent", 30);
-    oParagraph = getTableCellParagraph(oTable, 0, 0);
-    addTextToParagraph(oParagraph, "Qty.", 30, true);
-    oParagraph = getTableCellParagraph(oTable, 0, 1);
-    addTextToParagraph(oParagraph, "Description", 30, true);
+    table = createFullWidthTable(api, 10, 2, 200);
+    table.Call("GetRow", 0).Call("SetBackgroundColor", 245, 245, 245, false);
+    CValue cell = table.Call("GetCell", 0, 0);
+    cell.Call("SetWidth", "percent", 30);
+    paragraph = getTableCellParagraph(table, 0, 0);
+    addTextToParagraph(paragraph, "Qty.", 30, true);
+    paragraph = getTableCellParagraph(table, 0, 1);
+    addTextToParagraph(paragraph, "Description", 30, true);
 
     for (int i = 1; i < 10; i++)
     {
-        CValue oTempParagraph = getTableCellParagraph(oTable, i, 0);
-        CValue oTempTextForm = oApi.Call("CreateTextForm");
-        setTextFormProperties(oTempTextForm, "Qty" + std::to_string(i), "Qty" + std::to_string(i), false, " ", true, 9, 1, false, false);
-        addTextFormToParagraph(oTempParagraph, oTempTextForm, 30, "left", false, 255);
-        oTempParagraph = getTableCellParagraph(oTable, i, 1);
-        oTempTextForm = oApi.Call("CreateTextForm");
-        setTextFormProperties(oTempTextForm, "Description" + std::to_string(i), "Description" + std::to_string(i), false, " ", true, 22, 1, false, false);
-        addTextFormToParagraph(oTempParagraph, oTempTextForm, 30, "left", false, 255);
+        CValue tempParagraph = getTableCellParagraph(table, i, 0);
+        CValue tempTextForm = api.Call("CreateTextForm");
+        setTextFormProperties(tempTextForm, "Qty" + std::to_string(i), "Qty" + std::to_string(i), false, " ", true, 9, 1, false, false);
+        addTextFormToParagraph(tempParagraph, tempTextForm, 30, "left", false, 255);
+        tempParagraph = getTableCellParagraph(table, i, 1);
+        tempTextForm = api.Call("CreateTextForm");
+        setTextFormProperties(tempTextForm, "Description" + std::to_string(i), "Description" + std::to_string(i), false, " ", true, 22, 1, false, false);
+        addTextFormToParagraph(tempParagraph, tempTextForm, 30, "left", false, 255);
     }
 
-    oDocument.Call("Push", oTable);
-    oDocument.Call("RemoveElement", 0);
-    oDocument.Call("RemoveElement", 1);
+    document.Call("Push", table);
+    document.Call("RemoveElement", 0);
+    document.Call("RemoveElement", 1);
 
     // Save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

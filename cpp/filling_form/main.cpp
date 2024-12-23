@@ -48,19 +48,17 @@ int main()
 
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.SetProperty("--work-directory", workDir);
+    CDocBuilder builder;
     wstring templatePath = NSUtils::GetResourcesDirectory() + L"/docs/form.docx";
-    oBuilder.OpenFile(templatePath.c_str(), L"");
+    builder.OpenFile(templatePath.c_str(), L"");
 
-    CContext oContext = oBuilder.GetContext();
-    CContextScope oScope = oContext.CreateScope();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
 
     // Fill form
-    CValue oDocument = oApi.Call("GetDocument");
-    CValue aForms = oDocument.Call("GetAllForms");
+    CValue document = api.Call("GetDocument");
+    CValue aForms = document.Call("GetAllForms");
 
     int formNum = 0;
     while (formNum < (int)aForms.GetLength())
@@ -74,8 +72,8 @@ int main()
     }
 
     // Save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_DOCX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }

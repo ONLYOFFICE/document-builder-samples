@@ -45,44 +45,42 @@ int main()
 
     // Init DocBuilder
     CDocBuilder::Initialize(workDir);
-    CDocBuilder oBuilder;
-    oBuilder.SetProperty("--work-directory", workDir);
-    oBuilder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
+    CDocBuilder builder;
+    builder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
 
-    CContext oContext = oBuilder.GetContext();
-    CContextScope oScope = oContext.CreateScope();
-    CValue oGlobal = oContext.GetGlobal();
-    CValue oApi = oGlobal["Api"];
+    CContext context = builder.GetContext();
+    CValue global = context.GetGlobal();
+    CValue api = global["Api"];
 
     // Get current worksheet
-    CValue oWorksheet = oApi.Call("GetActiveSheet");
+    CValue worksheet = api.Call("GetActiveSheet");
 
     // Create CValue array from data
     int rowsLen = sizeof data / sizeof data[0];
     int colsLen = sizeof data[0] / sizeof(string);
-    CValue oArray = oContext.CreateArray(rowsLen);
+    CValue array = context.CreateArray(rowsLen);
 
     for (int row = 0; row < rowsLen; row++)
     {
-        CValue oArrayCol = oContext.CreateArray(colsLen);
+        CValue arrayCol = context.CreateArray(colsLen);
 
         for (int col = 0; col < colsLen; col++)
         {
-            oArrayCol[col] = data[row][col].c_str();
+            arrayCol[col] = data[row][col].c_str();
         }
-        oArray[row] = oArrayCol;
+        array[row] = arrayCol;
     }
 
     // First cell in the range (A1) is equal to (0,0)
-    CValue startCell = oWorksheet.Call("GetRangeByNumber", 0, 0);
+    CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
 
     // Last cell in the range is equal to array length -1
-    CValue endCell = oWorksheet.Call("GetRangeByNumber", oArray.GetLength() - 1, oArray[0].GetLength() - 1);
-    oWorksheet.Call("GetRange", startCell, endCell).Call("SetValue", oArray);
+    CValue endCell = worksheet.Call("GetRangeByNumber", array.GetLength() - 1, array[0].GetLength() - 1);
+    worksheet.Call("GetRange", startCell, endCell).Call("SetValue", array);
 
     // Save and close
-    oBuilder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
-    oBuilder.CloseFile();
+    builder.SaveFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX, resultPath);
+    builder.CloseFile();
     CDocBuilder::Dispose();
     return 0;
 }
