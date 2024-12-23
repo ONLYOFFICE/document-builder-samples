@@ -63,7 +63,7 @@ namespace NSUtils
 	}
 #else
 	#define FILE_SEPARATOR '/'
-	inline void WriteCodepoint(int code, wchar_t* unicodes_cur)
+	inline void WriteCodepoint(int code, wchar_t*& unicodes_cur)
 	{
 		*unicodes_cur++ = (wchar_t)code;
 	}
@@ -184,6 +184,10 @@ namespace NSUtils
 
 		return sOutput;
 	}
+
+	typedef long LONG;
+	typedef unsigned char BYTE;
+	typedef wchar_t WCHAR;
 
 	void GetUtf8StringFromUnicode_4bytes(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount, bool bIsBOM)
 	{
@@ -356,7 +360,7 @@ namespace NSUtils
 	}
 }
 
-#define U_TO_UTF8(val) NSUtils::GetUtf8StringFromUnicode(val.c_str(), (LONG)val.length())
+#define U_TO_UTF8(val) NSUtils::GetUtf8StringFromUnicode(val.c_str(), (long)val.length())
 
 namespace NSUtils
 {
