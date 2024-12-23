@@ -61,7 +61,7 @@ int main()
     worksheet.Call("GetRange", startCell, endCell).Call("SetBold", true);
     // fill table data
     const json& inventory = data["inventory"];
-    for (int i = 0; i < inventory.size(); i++)
+    for (int i = 0; i < (int)inventory.size(); i++)
     {
         const json& entry = inventory[i];
         CValue cell = worksheet.Call("GetRangeByNumber", i + 1, 0);

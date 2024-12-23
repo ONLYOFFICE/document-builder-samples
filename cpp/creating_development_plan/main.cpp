@@ -68,7 +68,7 @@ CValue getTableCellParagraph(CValue table, int row, int col)
 
 void fillTableHeaders(CValue table, const vector<string>& data, int fontSize)
 {
-    for (int i = 0; i < data.size(); i++)
+    for (int i = 0; i < (int)data.size(); i++)
     {
         CValue paragraph = getTableCellParagraph(table, 0, i);
         addTextToParagraph(paragraph, data[i], fontSize, true);
@@ -77,9 +77,9 @@ void fillTableHeaders(CValue table, const vector<string>& data, int fontSize)
 
 void fillTableBody(CValue table, const json& data, const vector<string>& keys, int fontSize, int startRow = 1)
 {
-    for (int row = 0; row < data.size(); row++)
+    for (int row = 0; row < (int)data.size(); row++)
     {
-        for (int col = 0; col < keys.size(); col++)
+        for (int col = 0; col < (int)keys.size(); col++)
         {
             CValue paragraph = getTableCellParagraph(table, row + startRow, col);
             const string& key = keys[col];

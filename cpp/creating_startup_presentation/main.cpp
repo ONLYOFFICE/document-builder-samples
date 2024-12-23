@@ -94,7 +94,7 @@ string makeBulletString(char bullet, int repeats)
 CValue createStringArray(const vector<string>& values)
 {
     CValue arrResult = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
+    for (int i = 0; i < (int)values.size(); i++)
     {
         arrResult[i] = values[i].c_str();
     }
@@ -332,15 +332,15 @@ int main()
     vector<string> chartKeys = { "revenue", "cost_of_goods_sold", "gross_profit", "operating_expenses", "net_profit" };
     const json& profitForecast = data["profit_forecast"];
     CValue arrChartYears = CValue::CreateArray((int)profitForecast.size());
-    for (int i = 0; i < profitForecast.size(); i++)
+    for (int i = 0; i < (int)profitForecast.size(); i++)
     {
         arrChartYears[i] = profitForecast[i]["year"].get<string>().c_str();
     }
     arrChartData = CValue::CreateArray((int)chartKeys.size());
-    for (int i = 0; i < chartKeys.size(); i++)
+    for (int i = 0; i < (int)chartKeys.size(); i++)
     {
         arrChartData[i] = CValue::CreateArray((int)profitForecast.size());
-        for (int j = 0; j < profitForecast.size(); j++)
+        for (int j = 0; j < (int)profitForecast.size(); j++)
         {
             arrChartData[i][j] = profitForecast[j][chartKeys[i]].get<string>().c_str();
         }
@@ -419,7 +419,7 @@ int main()
     const json& growthRates = data["growth_rates"];
     arrChartYears = CValue::CreateArray((int)growthRates.size());
     CValue arrChartGrowth = CValue::CreateArray((int)growthRates.size());
-    for (int i = 0; i < growthRates.size(); i++)
+    for (int i = 0; i < (int)growthRates.size(); i++)
     {
         arrChartYears[i] = growthRates[i]["year"].get<string>().c_str();
         arrChartGrowth[i] = growthRates[i]["growth"].get<string>().c_str();

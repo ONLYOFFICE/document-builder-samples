@@ -38,7 +38,7 @@ const wchar_t* resultPath = L"result.xlsx";
 CValue createColumnData(const vector<string>& data)
 {
     CValue arrColumnData = CValue::CreateArray((int)data.size());
-    for (int i = 0; i < data.size(); i++)
+    for (int i = 0; i < (int)data.size(); i++)
     {
         CValue arrRow = CValue::CreateArray(1);
         arrRow[0] = data[i].c_str();

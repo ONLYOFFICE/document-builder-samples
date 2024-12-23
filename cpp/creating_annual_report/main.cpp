@@ -68,7 +68,7 @@ CValue getTableCellParagraph(CValue table, int row, int col)
 
 void fillTableHeaders(CValue table, const vector<string>& data, int fontSize)
 {
-    for (int i = 0; i < data.size(); i++)
+    for (int i = 0; i < (int)data.size(); i++)
     {
         CValue paragraph = getTableCellParagraph(table, 0, i);
         addTextToParagraph(paragraph, data[i], fontSize, true);
@@ -77,9 +77,9 @@ void fillTableHeaders(CValue table, const vector<string>& data, int fontSize)
 
 void fillTableBody(CValue table, const json& data, const vector<string>& keys, int fontSize, int startRow = 1)
 {
-    for (int row = 0; row < data.size(); row++)
+    for (int row = 0; row < (int)data.size(); row++)
     {
-        for (int col = 0; col < keys.size(); col++)
+        for (int col = 0; col < (int)keys.size(); col++)
         {
             CValue paragraph = getTableCellParagraph(table, row + startRow, col);
             const string& key = keys[col];
@@ -109,7 +109,7 @@ CValue createNumbering(CValue api, const json& data, string numberingType, int f
 CValue createStringArray(const vector<string>& values)
 {
     CValue arrResult = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
+    for (int i = 0; i < (int)values.size(); i++)
     {
         arrResult[i] = values[i].c_str();
     }
@@ -120,7 +120,7 @@ CValue createStringArray(const vector<string>& values)
 CValue createIntegerArray(const vector<int>& values)
 {
     CValue arrResult = CValue::CreateArray((int)values.size());
-    for (int i = 0; i < values.size(); i++)
+    for (int i = 0; i < (int)values.size(); i++)
     {
         arrResult[i] = values[i];
     }
@@ -164,10 +164,10 @@ int main()
     vector<string> chartKeys = { "revenue", "expenses", "net_profit" };
     const json& quarterlyData = data["financials"]["quarterly_data"];
     CValue arrChartData = CValue::CreateArray((int)chartKeys.size());
-    for (int i = 0; i < chartKeys.size(); i++)
+    for (int i = 0; i < (int)chartKeys.size(); i++)
     {
         arrChartData[i] = CValue::CreateArray((int)quarterlyData.size());
-        for (int j = 0; j < quarterlyData.size(); j++)
+        for (int j = 0; j < (int)quarterlyData.size(); j++)
         {
             arrChartData[i][j] = quarterlyData[j][chartKeys[i]].get<int>();
         }
