@@ -41,7 +41,7 @@ if __name__ == '__main__':
     globalObj = context.GetGlobal()
     api = globalObj['Api']
 
-    # Find and comment formula errors
+    # Get current worksheet
     worksheet = api.Call('GetActiveSheet')
 
     # Create array from data

@@ -52,7 +52,7 @@ public class Program {
         CDocBuilderValue global = context.getGlobal();
         CDocBuilderValue api = global.get("Api");
 
-        // Create spreadsheet
+        // Get current worksheet
         CDocBuilderValue worksheet = api.call("GetActiveSheet");
 
         // Convert data to array value type

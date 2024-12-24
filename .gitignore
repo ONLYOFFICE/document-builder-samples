@@ -4,3 +4,5 @@ out/
 *.pptx
 *.xlsx
 *.class
+
+.vscode

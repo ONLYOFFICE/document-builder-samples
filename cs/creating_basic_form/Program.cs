@@ -21,13 +21,12 @@ using docbuilder_net;
 using OfficeFileTypes = docbuilder_net.FileTypes;
 using CValue = docbuilder_net.CDocBuilderValue;
 using CContext = docbuilder_net.CDocBuilderContext;
-using CContextScope = docbuilder_net.CDocBuilderContextScope;
 
 namespace Sample
 {
     public class CreatingBasicForm
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.docx";
@@ -44,65 +43,64 @@ namespace Sample
 
             // Init DocBuilder
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
-            oBuilder.CreateFile(doctype);
+            CDocBuilder builder = new();
+            builder.CreateFile(doctype);
 
-            CContext oContext = oBuilder.GetContext();
-            CContextScope oScope = oContext.CreateScope();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
 
             // Create basic form
-            CValue oDocument = oApi.Call("GetDocument");
-            CValue oParagraph = oDocument.Call("GetElement", 0);
-            CValue oHeadingStyle = oDocument.Call("GetStyle", "Heading 3");
+            CValue document = api.Call("GetDocument");
+            CValue paragraph = document.Call("GetElement", 0);
+            CValue headingStyle = document.Call("GetStyle", "Heading 3");
 
-            oParagraph.Call("AddText", "Employee pass card");
-            oParagraph.Call("SetStyle", oHeadingStyle);
-            oDocument.Call("Push", oParagraph);
+            paragraph.Call("AddText", "Employee pass card");
+            paragraph.Call("SetStyle", headingStyle);
+            document.Call("Push", paragraph);
 
-            CValue oPictureForm = oApi.Call("CreatePictureForm");
-            setPictureFormProperties(oPictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50);
-            oParagraph = oApi.Call("CreateParagraph");
-            oParagraph.Call("AddElement", oPictureForm);
-            oDocument.Call("Push", oParagraph);
+            CValue pictureForm = api.Call("CreatePictureForm");
+            SetPictureFormProperties(pictureForm, "Photo", "Upload your photo", false, "Photo", "tooBig", true, false, 50, 50);
+            paragraph = api.Call("CreateParagraph");
+            paragraph.Call("AddElement", pictureForm);
+            document.Call("Push", paragraph);
 
-            CValue oTextForm = oApi.Call("CreateTextForm");
-            setTextFormProperties(oTextForm, "First name", "Enter your first name", false, "First name", true, 13, 3, false, false);
-            oParagraph = oApi.Call("CreateParagraph");
-            oParagraph.Call("AddElement", oTextForm);
-            oDocument.Call("Push", oParagraph);
+            CValue textForm = api.Call("CreateTextForm");
+            SetTextFormProperties(textForm, "First name", "Enter your first name", false, "First name", true, 13, 3, false, false);
+            paragraph = api.Call("CreateParagraph");
+            paragraph.Call("AddElement", textForm);
+            document.Call("Push", paragraph);
 
             // Save file and close DocBuilder
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
 
             CDocBuilder.Destroy();
         }
 
-        public static void setPictureFormProperties(CValue oPictureForm, string key, string tip, bool required, string placeholder, string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
+        public static void SetPictureFormProperties(CValue pictureForm, string key, string tip, bool required, string placeholder, string scaleFlag, bool lockAspectRatio, bool respectBorders, int shiftX, int shiftY)
         {
-            oPictureForm.Call("SetFormKey", key);
-            oPictureForm.Call("SetTipText", tip);
-            oPictureForm.Call("SetRequired", required);
-            oPictureForm.Call("SetPlaceholderText", placeholder);
-            oPictureForm.Call("SetScaleFlag", scaleFlag);
-            oPictureForm.Call("SetLockAspectRatio", lockAspectRatio);
-            oPictureForm.Call("SetRespectBorders", respectBorders);
-            oPictureForm.Call("SetPicturePosition", shiftX, shiftY);
+            pictureForm.Call("SetFormKey", key);
+            pictureForm.Call("SetTipText", tip);
+            pictureForm.Call("SetRequired", required);
+            pictureForm.Call("SetPlaceholderText", placeholder);
+            pictureForm.Call("SetScaleFlag", scaleFlag);
+            pictureForm.Call("SetLockAspectRatio", lockAspectRatio);
+            pictureForm.Call("SetRespectBorders", respectBorders);
+            pictureForm.Call("SetPicturePosition", shiftX, shiftY);
         }
 
-        public static void setTextFormProperties(CValue oTextForm, string key, string tip, bool required, string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)
+        public static void SetTextFormProperties(CValue textForm, string key, string tip, bool required, string placeholder, bool comb, int maxCharacters, int cellWidth, bool multiLine, bool autoFit)
         {
-            oTextForm.Call("SetFormKey", key);
-            oTextForm.Call("SetTipText", tip);
-            oTextForm.Call("SetRequired", required);
-            oTextForm.Call("SetPlaceholderText", placeholder);
-            oTextForm.Call("SetComb", comb);
-            oTextForm.Call("SetCharactersLimit", maxCharacters);
-            oTextForm.Call("SetCellWidth", cellWidth);
-            oTextForm.Call("SetCellWidth", multiLine);
-            oTextForm.Call("SetMultiline", autoFit);
+            textForm.Call("SetFormKey", key);
+            textForm.Call("SetTipText", tip);
+            textForm.Call("SetRequired", required);
+            textForm.Call("SetPlaceholderText", placeholder);
+            textForm.Call("SetComb", comb);
+            textForm.Call("SetCharactersLimit", maxCharacters);
+            textForm.Call("SetCellWidth", cellWidth);
+            textForm.Call("SetCellWidth", multiLine);
+            textForm.Call("SetMultiline", autoFit);
         }
     }
 }

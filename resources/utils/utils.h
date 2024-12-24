@@ -1,32 +1,18 @@
-/*
- * (c) Copyright Ascensio System SIA 2010-2023
+/**
  *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation. In accordance with
- * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
- * that Ascensio System SIA expressly excludes the warranty of non-infringement
- * of any third-party rights.
+ * (c) Copyright Ascensio System SIA 2024
  *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
- * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You can contact Ascensio System SIA at 20A-6 Ernesta Birznieka-Upish
- * street, Riga, Latvia, EU, LV-1050.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * The  interactive user interfaces in modified source and object code versions
- * of the Program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU AGPL version 3.
- *
- * Pursuant to Section 7(b) of the License you must retain the original Product
- * logo when distributing the program. Pursuant to Section 7(e) we decline to
- * grant you any rights under trademark law for use of our trademarks.
- *
- * All the Product's GUI elements, including illustrations and icon sets, as
- * well as technical writing content are licensed under the terms of the
- * Creative Commons Attribution-ShareAlike 4.0 International. See the License
- * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -61,19 +47,26 @@
 namespace NSUtils
 {
 #ifdef _WIN32
-	#define PATH_SEPARATOR '\\'
-	#define WriteCodepoint(code)							\
-	if (code < 0x10000)										\
-		*unicodes_cur++ = code;								\
-	else													\
-	{														\
-		code -= 0x10000;									\
-		*unicodes_cur++ = 0xD800 | ((code >> 10) & 0x03FF);	\
-		*unicodes_cur++ = 0xDC00 | (code & 0x03FF);			\
+	#define FILE_SEPARATOR '\\'
+	inline void WriteCodepoint(int code, wchar_t* unicodes_cur)
+	{
+		if (code < 0x10000)
+		{
+			*unicodes_cur++ = code;
+		}
+		else
+		{
+			code -= 0x10000;
+			*unicodes_cur++ = 0xD800 | ((code >> 10) & 0x03FF);
+			*unicodes_cur++ = 0xDC00 | (code & 0x03FF);
+		}
 	}
 #else
-	#define PATH_SEPARATOR '/'
-	#define WriteCodepoint(code) *unicodes_cur++ = (wchar_t)code;
+	#define FILE_SEPARATOR '/'
+	inline void WriteCodepoint(int code, wchar_t*& unicodes_cur)
+	{
+		*unicodes_cur++ = (wchar_t)code;
+	}
 #endif
 
 	std::wstring GetStringFromUtf8(const unsigned char* utf8, size_t length)
@@ -88,7 +81,7 @@ namespace NSUtils
 			if (0x00 == (byteMain & 0x80))
 			{
 				// 1 byte
-				WriteCodepoint(byteMain)
+				WriteCodepoint(byteMain, unicodes_cur);
 				++index;
 			}
 			else if (0x00 == (byteMain & 0x20))
@@ -101,7 +94,7 @@ namespace NSUtils
 								(utf8[index + 1] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 2;
 			}
 			else if (0x00 == (byteMain & 0x10))
@@ -115,7 +108,7 @@ namespace NSUtils
 								(utf8[index + 2] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 3;
 			}
 			else if (0x00 == (byteMain & 0x0F))
@@ -130,7 +123,7 @@ namespace NSUtils
 								(utf8[index + 3] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 4;
 			}
 			else if (0x00 == (byteMain & 0x08))
@@ -145,7 +138,7 @@ namespace NSUtils
 								(utf8[index + 3] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 4;
 			}
 			else if (0x00 == (byteMain & 0x04))
@@ -161,7 +154,7 @@ namespace NSUtils
 								(utf8[index + 4] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 5;
 			}
 			else
@@ -178,7 +171,7 @@ namespace NSUtils
 								(utf8[index + 5] & 0x3F));
 				}
 
-				WriteCodepoint(val)
+				WriteCodepoint(val, unicodes_cur);
 				index += 5;
 			}
 		}
@@ -191,7 +184,183 @@ namespace NSUtils
 
 		return sOutput;
 	}
+
+	typedef long LONG;
+	typedef unsigned char BYTE;
+	typedef wchar_t WCHAR;
+
+	void GetUtf8StringFromUnicode_4bytes(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount, bool bIsBOM)
+	{
+		if (NULL == pData)
+		{
+			pData = new BYTE[6 * lCount + 3 + 1];
+		}
+
+		BYTE* pCodesCur = pData;
+		if (bIsBOM)
+		{
+			pCodesCur[0] = 0xEF;
+			pCodesCur[1] = 0xBB;
+			pCodesCur[2] = 0xBF;
+			pCodesCur += 3;
+		}
+
+		const wchar_t* pEnd = pUnicodes + lCount;
+		const wchar_t* pCur = pUnicodes;
+
+		while (pCur < pEnd)
+		{
+			unsigned int code = (unsigned int)*pCur++;
+
+			if (code < 0x80)
+			{
+				*pCodesCur++ = (BYTE)code;
+			}
+			else if (code < 0x0800)
+			{
+				*pCodesCur++ = 0xC0 | (code >> 6);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x10000)
+			{
+				*pCodesCur++ = 0xE0 | (code >> 12);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x1FFFFF)
+			{
+				*pCodesCur++ = 0xF0 | (code >> 18);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x3FFFFFF)
+			{
+				*pCodesCur++ = 0xF8 | (code >> 24);
+				*pCodesCur++ = 0x80 | (code >> 18 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x7FFFFFFF)
+			{
+				*pCodesCur++ = 0xFC | (code >> 30);
+				*pCodesCur++ = 0x80 | (code >> 24 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 18 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 12 & 0x3F);
+				*pCodesCur++ = 0x80 | (code >> 6 & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+		}
+
+		lOutputCount = (LONG)(pCodesCur - pData);
+		*pCodesCur++ = 0;
+	}
+
+	void GetUtf8StringFromUnicode_2bytes(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount, bool bIsBOM)
+	{
+		if (NULL == pData)
+		{
+			pData = new BYTE[6 * lCount + 3 + 1];
+		}
+
+		BYTE* pCodesCur = pData;
+		if (bIsBOM)
+		{
+			pCodesCur[0] = 0xEF;
+			pCodesCur[1] = 0xBB;
+			pCodesCur[2] = 0xBF;
+			pCodesCur += 3;
+		}
+
+		const wchar_t* pEnd = pUnicodes + lCount;
+		const wchar_t* pCur = pUnicodes;
+
+		while (pCur < pEnd)
+		{
+			unsigned int code = (unsigned int)*pCur++;
+			if (code >= 0xD800 && code <= 0xDFFF && pCur < pEnd)
+			{
+				code = 0x10000 + (((code & 0x3FF) << 10) | (0x03FF & *pCur++));
+			}
+
+			if (code < 0x80)
+			{
+				*pCodesCur++ = (BYTE)code;
+			}
+			else if (code < 0x0800)
+			{
+				*pCodesCur++ = 0xC0 | (code >> 6);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x10000)
+			{
+				*pCodesCur++ = 0xE0 | (code >> 12);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x1FFFFF)
+			{
+				*pCodesCur++ = 0xF0 | (code >> 18);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x3FFFFFF)
+			{
+				*pCodesCur++ = 0xF8 | (code >> 24);
+				*pCodesCur++ = 0x80 | ((code >> 18) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+			else if (code < 0x7FFFFFFF)
+			{
+				*pCodesCur++ = 0xFC | (code >> 30);
+				*pCodesCur++ = 0x80 | ((code >> 24) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 18) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 12) & 0x3F);
+				*pCodesCur++ = 0x80 | ((code >> 6) & 0x3F);
+				*pCodesCur++ = 0x80 | (code & 0x3F);
+			}
+		}
+
+		lOutputCount = (LONG)(pCodesCur - pData);
+		*pCodesCur++ = 0;
+	}
+
+	void GetUtf8StringFromUnicode(const wchar_t* pUnicodes, LONG lCount, BYTE*& pData, LONG& lOutputCount)
+	{
+		if (NULL == pUnicodes || 0 == lCount)
+		{
+			pData = NULL;
+			lOutputCount = 0;
+			return;
+		}
+
+		if (sizeof(WCHAR) == 2)
+			return GetUtf8StringFromUnicode_2bytes(pUnicodes, lCount, pData, lOutputCount, false);
+		return GetUtf8StringFromUnicode_4bytes(pUnicodes, lCount, pData, lOutputCount, false);
+	}
+
+	std::string GetUtf8StringFromUnicode(const wchar_t* pUnicodes, LONG lCount)
+	{
+		if (NULL == pUnicodes || 0 == lCount)
+			return "";
+
+		BYTE* pData = NULL;
+		LONG lLen = 0;
+
+		GetUtf8StringFromUnicode(pUnicodes, lCount, pData, lLen);
+
+		std::string s((char*)pData, lLen);
+
+		delete[] pData;
+		return s;
+	}
 }
+
+#define U_TO_UTF8(val) NSUtils::GetUtf8StringFromUnicode(val.c_str(), (long)val.length())
 
 namespace NSUtils
 {
@@ -221,7 +390,7 @@ namespace NSUtils
 	std::wstring GetProcessDirectory()
 	{
 		std::wstring path = GetProcessPath();
-		size_t pos = path.find_last_of(PATH_SEPARATOR);
+		size_t pos = path.find_last_of(FILE_SEPARATOR);
 		if (pos != std::wstring::npos)
 			path = path.substr(0, pos);
 		return path;
@@ -232,7 +401,7 @@ namespace NSUtils
 		std::wstring path = GetProcessDirectory();
 		while (!path.empty())
 		{
-			size_t pos = path.find_last_of(PATH_SEPARATOR);
+			size_t pos = path.find_last_of(FILE_SEPARATOR);
 			if (pos != std::wstring::npos)
 			{
 				std::wstring currDir = path.substr(pos + 1);
@@ -240,7 +409,7 @@ namespace NSUtils
 				path = path.substr(0, pos);
 				if (currDir == L"out")
 				{
-					path += PATH_SEPARATOR;
+					path += FILE_SEPARATOR;
 					path += L"resources";
 					break;
 				}

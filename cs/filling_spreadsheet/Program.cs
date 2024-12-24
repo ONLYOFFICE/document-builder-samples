@@ -21,13 +21,12 @@ using docbuilder_net;
 using OfficeFileTypes = docbuilder_net.FileTypes;
 using CValue = docbuilder_net.CDocBuilderValue;
 using CContext = docbuilder_net.CDocBuilderContext;
-using CContextScope = docbuilder_net.CDocBuilderContextScope;
 
 namespace Sample
 {
     public class FillingSpreadsheet
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string resultPath = "../../../result.xlsx";
@@ -54,47 +53,46 @@ namespace Sample
 
             // Init DocBuilder
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
+            CDocBuilder builder = new();
 
-            oBuilder.CreateFile(doctype);
-            CContext oContext = oBuilder.GetContext();
-            CContextScope oScope = oContext.CreateScope();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
-            CValue oWorksheet = oApi.Call("GetActiveSheet");
+            builder.CreateFile(doctype);
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
+            CValue worksheet = api.Call("GetActiveSheet");
 
             // pass data
-            CValue oArray = TwoDimArrayToCValue(data, oContext);
+            CValue array = TwoDimArrayToCValue(data, context);
             // First cell in the range (A1) is equal to (0,0)
-            CValue startCell = oWorksheet.Call("GetRangeByNumber", 0, 0);
+            CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
             // Last cell in the range is equal to array length -1
-            CValue endCell = oWorksheet.Call("GetRangeByNumber", oArray.GetLength() - 1, oArray[0].GetLength() - 1);
-            oWorksheet.Call("GetRange", startCell, endCell).Call("SetValue", oArray);
+            CValue endCell = worksheet.Call("GetRangeByNumber", array.GetLength() - 1, array[0].GetLength() - 1);
+            worksheet.Call("GetRange", startCell, endCell).Call("SetValue", array);
 
 
             // Save file and close DocBuilder
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
             CDocBuilder.Destroy();
         }
 
-        public static CValue TwoDimArrayToCValue(object[,] data, CContext oContext)
+        public static CValue TwoDimArrayToCValue(object[,] data, CContext context)
         {
             int rowsLen = data.GetLength(0);
             int colsLen = data.GetLength(1);
-            CValue oArray = oContext.CreateArray(rowsLen);
+            CValue array = context.CreateArray(rowsLen);
 
             for (int row = 0; row < rowsLen; row++)
             {
-                CValue oArrayCol = oContext.CreateArray(colsLen);
+                CValue arrayCol = context.CreateArray(colsLen);
 
                 for (int col = 0; col < colsLen; col++)
                 {
-                    oArrayCol[col] = data[row, col].ToString();
+                    arrayCol[col] = data[row, col].ToString();
                 }
-                oArray[row] = oArrayCol;
+                array[row] = arrayCol;
             }
-            return oArray;
+            return array;
         }
     }
 }

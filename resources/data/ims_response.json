@@ -1,0 +1,29 @@
+{
+    "inventory": [
+        {
+            "item": "HP ProBook Laptop",
+            "quantity": 15,
+            "status": "In Stock"
+        },
+        {
+            "item": "Logitech Mouse",
+            "quantity": 30,
+            "status": "Reserved"
+        },
+        {
+            "item": "Canon Printer",
+            "quantity": 5,
+            "status": "Pending Delivery"
+        },
+        {
+            "item": "Corsair Keyboard",
+            "quantity": 10,
+            "status": "In Stock"
+        },
+        {
+            "item": "Samsung Monitor",
+            "quantity": 8,
+            "status": "In Stock"
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+{
+    "profit_forecast": [
+        {
+            "year": "2025",
+            "revenue": "1.5 million USD",
+            "cost_of_goods_sold": "0.7 million USD",
+            "gross_profit": "0.8 million USD",
+            "operating_expenses": "0.5 million USD",
+            "net_profit": "0.3 million USD"
+        },
+        {
+            "year": "2026",
+            "revenue": "2.0 million USD",
+            "cost_of_goods_sold": "0.9 million USD",
+            "gross_profit": "1.1 million USD",
+            "operating_expenses": "0.6 million USD",
+            "net_profit": "0.5 million USD"
+        },
+        {
+            "year": "2027",
+            "revenue": "2.5 million USD",
+            "cost_of_goods_sold": "1.0 million USD",
+            "gross_profit": "1.5 million USD",
+            "operating_expenses": "0.7 million USD",
+            "net_profit": "0.8 million USD"
+        }
+    ],
+    "break_even_analysis": {
+        "fixed_costs": "10000 USD",
+        "selling_price_per_unit": "100 USD",
+        "variable_cost_per_unit": "50 USD",
+        "break_even_point": 200
+    },
+    "growth_rates": [
+        {
+            "year": "2025",
+            "growth": "20%"
+        },
+        {
+            "year": "2026",
+            "growth": "25%"
+        },
+        {
+            "year": "2027",
+            "growth": "30%"
+        }
+    ]
+}

@@ -21,7 +21,6 @@ using docbuilder_net;
 using OfficeFileTypes = docbuilder_net.FileTypes;
 using CValue = docbuilder_net.CDocBuilderValue;
 using CContext = docbuilder_net.CDocBuilderContext;
-using CContextScope = docbuilder_net.CDocBuilderContextScope;
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +29,7 @@ namespace Sample
 {
     public class FillingForm
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
             string filePath = "../../../../../../resources/docs/form.docx";
@@ -61,28 +60,27 @@ namespace Sample
 
             // Init DocBuilder
             CDocBuilder.Initialize(workDirectory);
-            CDocBuilder oBuilder = new CDocBuilder();
-            oBuilder.OpenFile(filePath, "docxf");
+            CDocBuilder builder = new();
+            builder.OpenFile(filePath, "docxf");
 
-            CContext oContext = oBuilder.GetContext();
-            CContextScope oScope = oContext.CreateScope();
-            CValue oGlobal = oContext.GetGlobal();
-            CValue oApi = oGlobal["Api"];
+            CContext context = builder.GetContext();
+            CValue global = context.GetGlobal();
+            CValue api = global["Api"];
 
             // Fill form
-            CValue oDocument = oApi.Call("GetDocument");
-            CValue aForms = oDocument.Call("GetAllForms");
+            CValue document = api.Call("GetDocument");
+            CValue forms = document.Call("GetAllForms");
             int formNum = 0;
-            while (formNum < aForms.GetLength())
+            while (formNum < forms.GetLength())
             {
-                CValue form = aForms[formNum];
+                CValue form = forms[formNum];
                 string type = form.Call("GetFormType").ToString();
                 string value;
                 try
                 {
                     value = formData[form.Call("GetFormKey").ToString()];
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     value = "";
                 }
@@ -92,8 +90,8 @@ namespace Sample
             }
 
             // Save file and close DocBuilder
-            oBuilder.SaveFile(doctype, resultPath);
-            oBuilder.CloseFile();
+            builder.SaveFile(doctype, resultPath);
+            builder.CloseFile();
 
             CDocBuilder.Destroy();
         }
