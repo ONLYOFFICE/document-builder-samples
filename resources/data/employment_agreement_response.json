@@ -1,0 +1,43 @@
+{
+  "date": "19/12/2024",
+  "employer": {
+    "name": "BrightTech Solutions LLC",
+    "address": "123 Innovation Drive, San Francisco, CA 94103, USA"
+  },
+  "employee": {
+    "full_name": "John Smith",
+    "address": "45 Elm Street, Apt 12B, Los Angeles, CA 90001, USA"
+  },
+  "position_and_duties": {
+    "job_title": "Software Engineer"
+  },
+  "compensation": {
+    "salary": 8000,
+    "currency": "USD",
+    "frequency": "per month",
+    "type": "gross"
+  },
+  "probationary_period": {
+    "duration": "3 months",
+    "terminate": "7 days"
+  },
+  "work_conditions": {
+    "working_hours": "9:00 AM to 5:00 PM",
+    "work_schedule": "Monday to Friday",
+    "benefits": [
+      "health insurance (CareHealth Plan)",
+      "20 vacation days per year",
+      "10 sick leave days per year",
+      "annual bonus up to 10% of salary"
+    ],
+    "other_terms": [
+      "eligible for 2 days per week"
+    ]
+  },
+  "termination": {
+    "notice_period": "30 days"
+  },
+  "governing_law": {
+    "jurisdiction": "State of California, USA"
+  }
+}
