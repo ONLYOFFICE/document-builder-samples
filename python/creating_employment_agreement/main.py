@@ -106,8 +106,9 @@ if __name__ == '__main__':
         data = json.load(file_json)
 
     # init docbuilder and create new docx file
+    doctype = docbuilder.FileTypes.Document.OFORM_PDF
     builder = docbuilder.CDocBuilder()
-    builder.CreateFile(docbuilder.FileTypes.Document.OFORM_PDF)
+    builder.CreateFile(doctype)
 
     context = builder.GetContext()
     global_obj = context.GetGlobal()
@@ -129,14 +130,13 @@ if __name__ == '__main__':
 
     header_desc = create_paragraph(
         api,
-        f'This Employment Agreement (“Agreement”) is made and entered into on {data["date"]} by and between:',
+        f'This Employment Agreement ("Agreement") is made and entered into on {data["date"]} by and between:',
     )
     set_spacing_after(header_desc, 50)
     document.Call('Push', header_desc)
 
     # PARTICIPANTS OF THE DOCUMENT
-    participants = api.Call('CreateParagraph')
-    participants.Call('SetJc', 'left')
+    participants = create_paragraph(api, '', jc='left')
     add_participant_to_paragraph(
         api,
         participants,
@@ -179,7 +179,7 @@ if __name__ == '__main__':
             api,
             f'The Employee will receive a salary of {data["compensation"]["salary"]} '
             f'{data["compensation"]["currency"]} {data["compensation"]["frequency"]} ({data["compensation"]["type"]}), '
-            'payable in accordance with the Employer’s payroll schedule and subject to lawful deductions.',
+            "payable in accordance with the Employer's payroll schedule and subject to lawful deductions.",
         ),
     )
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
             api,
             f'The Employee will serve a probationary period of {data["probationary_period"]["duration"]}. '
             'During this period, the Employer may terminate this Agreement with '
-            f'{data["probationary_period"]["terminate"]} days’ notice if performance is deemed unsatisfactory.',
+            f"{data["probationary_period"]["terminate"]} days' notice if performance is deemed unsatisfactory.",
         ),
     )
 
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     document.Call('Push', create_numbered_section(api, 'WORK CONDITIONS', numbering_lvl))
     conditions_text = create_conditions_desc_paragraph(
         api,
-        'The following terms apply to the Employee’s working conditions:',
+        "The following terms apply to the Employee's working conditions:",
     )
     set_spacing_after(conditions_text, 50)
     document.Call('Push', conditions_text)
@@ -280,5 +280,5 @@ if __name__ == '__main__':
 
     # save and close
     result_path = os.getcwd() + '/result.pdf'
-    builder.SaveFile(docbuilder.FileTypes.Document.OFORM_PDF, result_path)
+    builder.SaveFile(doctype, result_path)
     builder.CloseFile()
