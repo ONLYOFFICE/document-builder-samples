@@ -205,8 +205,8 @@ if __name__ == '__main__':
     document.Call('Push', conditions_text)
 
     # create bullet numbering
-    bullets_numbering = document.Call('CreateNumbering', 'bullet')
-    bul_num_lvl = bullets_numbering.Call('GetLevel', 0)
+    bullet_numbering = document.Call('CreateNumbering', 'bullet')
+    bul_num_lvl = bullet_numbering.Call('GetLevel', 0)
 
     document.Call(
         'Push',
@@ -224,7 +224,7 @@ if __name__ == '__main__':
         'Push',
         create_work_condition(
             api,
-            'Benefits',
+            'Other terms',
             ', '.join(data["work_conditions"]["other_terms"]),
             bul_num_lvl,
             set_spacing=False,
