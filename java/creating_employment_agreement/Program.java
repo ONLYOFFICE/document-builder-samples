@@ -19,6 +19,8 @@
 import docbuilder.*;
 
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -168,13 +170,19 @@ public class Program {
             "Push",
             createWorkCondition(api, "Work Schedule", workConditions.get("work_schedule").toString(), bulletNumLvl, true)
         );
+        JSONArray result1 = (JSONArray)workConditions.get("benefits");
+        List<String> benefits = new ArrayList<>();
+        for (Object item : result1) { benefits.add(item.toString()); }
         document.call(
             "Push",
-            createWorkCondition(api, "Benefits", workConditions.get("benefits").toString(), bulletNumLvl, true)
+            createWorkCondition(api, "Benefits", String.join(", ", benefits), bulletNumLvl, true)
         );
+        JSONArray result2 = (JSONArray)workConditions.get("other_terms");
+        List<String> otherTerms = new ArrayList<>();
+        for (int i = 0; i < result2.toArray().length; i++) { otherTerms.add(result2.get(i).toString()); }
         document.call(
             "Push",
-            createWorkCondition(api, "Other terms", workConditions.get("other_terms").toString(), bulletNumLvl, false)
+            createWorkCondition(api, "Other terms", String.join(", ", otherTerms), bulletNumLvl, false)
         );
 
         // TERMINATION
