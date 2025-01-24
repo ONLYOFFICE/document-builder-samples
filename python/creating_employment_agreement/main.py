@@ -52,14 +52,10 @@ def set_spacing_after(paragraph, spacing):
     paragraph.Call('SetSpacingAfter', spacing)
 
 
-def set_ind_first_line(paragraph, ind_first_line):
-    paragraph.Call('SetIndFirstLine', ind_first_line)
-
-
 def create_conditions_desc_paragraph(api, text):
     # create paragraph with first line indentation
     paragraph = create_paragraph(api, text)
-    set_ind_first_line(paragraph, 400)
+    paragraph.Call('SetIndFirstLine', 400)
     return paragraph
 
 
@@ -191,7 +187,7 @@ if __name__ == '__main__':
             api,
             f'The Employee will serve a probationary period of {data["probationary_period"]["duration"]}. '
             'During this period, the Employer may terminate this Agreement with '
-            f"{data["probationary_period"]["terminate"]} days' notice if performance is deemed unsatisfactory.",
+            f"{data['probationary_period']['terminate']} days' notice if performance is deemed unsatisfactory.",
         ),
     )
 

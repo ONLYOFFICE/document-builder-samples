@@ -19,8 +19,6 @@
 import docbuilder.*;
 
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,6 +27,11 @@ import org.json.simple.parser.JSONParser;
 public class Program {
     static int defaultFontSize = 24;
     static String defaultJc = "both";
+    static String[] signerData = {
+        "Name: __________________________",
+        "Signature: _______________________",
+        "Date: ___________________________"
+    };
 
     public static void main(String[] args) throws Exception {
         String resultPath = "result.pdf";
@@ -77,7 +80,7 @@ public class Program {
             ),
             false
         );
-        SetSpacingAfter(headerDesc, 50);
+        setSpacingAfter(headerDesc, 50);
         document.call("Push", headerDesc);
 
         // PARTICIPANTS OF THE DOCUMENT
@@ -95,7 +98,7 @@ public class Program {
             api,
             participants,
             "Employee",
-            String.format("%s, located at %s.", employee.get("full_name").toString(), employee.get("address").toString())
+            String.format("%s, residing at %s.", employee.get("full_name").toString(), employee.get("address").toString())
         );
         document.call("Push", participants);
         document.call("Push", createParagraph(api, "The parties agree to the following terms and conditions:", false));
@@ -154,11 +157,11 @@ public class Program {
             api,
             "The following terms apply to the Employee's working conditions:"
         );
-        SetSpacingAfter(conditionsText, 50);
+        setSpacingAfter(conditionsText, 50);
         document.call("Push", conditionsText);
 
         // Create bullet numbering
-        CDocBuilderValue bulletNumbering = document.call("CreateNumbering", "numbered");
+        CDocBuilderValue bulletNumbering = document.call("CreateNumbering", "bullet");
         CDocBuilderValue bulletNumLvl = bulletNumbering.call("GetLevel", 0);
 
         JSONObject workConditions = (JSONObject)data.get("work_conditions");
@@ -170,16 +173,20 @@ public class Program {
             "Push",
             createWorkCondition(api, "Work Schedule", workConditions.get("work_schedule").toString(), bulletNumLvl, true)
         );
-        JSONArray result1 = (JSONArray)workConditions.get("benefits");
-        List<String> benefits = new ArrayList<>();
-        for (Object item : result1) { benefits.add(item.toString()); }
+        JSONArray benefitsArray  = (JSONArray)workConditions.get("benefits");
+        String[] benefits = new String[benefitsArray.size()];
+        for (int i = 0; i < benefitsArray.size(); i++) {
+            benefits[i] = benefitsArray.get(i).toString();
+        }
         document.call(
             "Push",
             createWorkCondition(api, "Benefits", String.join(", ", benefits), bulletNumLvl, true)
         );
-        JSONArray result2 = (JSONArray)workConditions.get("other_terms");
-        List<String> otherTerms = new ArrayList<>();
-        for (int i = 0; i < result2.toArray().length; i++) { otherTerms.add(result2.get(i).toString()); }
+        JSONArray otherTermsArray  = (JSONArray)workConditions.get("other_terms");
+        String[] otherTerms = new String[otherTermsArray.size()];
+        for (int i = 0; i < otherTermsArray.size(); i++) {
+            otherTerms[i] = otherTermsArray.get(i).toString();
+        }
         document.call(
             "Push",
             createWorkCondition(api, "Other terms", String.join(", ", otherTerms), bulletNumLvl, false)
@@ -263,22 +270,18 @@ public class Program {
         return run;
     }
 
-    public static void SetNumbering(CDocBuilderValue paragraph, CDocBuilderValue numLvl) {
+    public static void setNumbering(CDocBuilderValue paragraph, CDocBuilderValue numLvl) {
         paragraph.call("SetNumbering", numLvl);
     }
 
-    public static void SetSpacingAfter(CDocBuilderValue paragraph, int spacing) {
+    public static void setSpacingAfter(CDocBuilderValue paragraph, int spacing) {
         paragraph.call("SetSpacingAfter", spacing);
-    }
-
-    public static void SetIndFirstLine(CDocBuilderValue paragraph, int IndFirstLine) {
-        paragraph.call("SetIndFirstLine", IndFirstLine);
     }
 
     public static CDocBuilderValue createConditionsDescParagraph(CDocBuilderValue api, String text) {
         // create paragraph with first line indentation
         CDocBuilderValue paragraph = createParagraph(api, text, false);
-        SetIndFirstLine(paragraph, 400);
+        paragraph.call("SetIndFirstLine", 400);
         return paragraph;
     }
 
@@ -287,18 +290,18 @@ public class Program {
         paragraph.call("Push", createRun(api, details, false, defaultFontSize));
     }
 
-    public static CDocBuilderValue createNumberedSection(CDocBuilderValue api, String text, CDocBuilderValue numberingLvl) {
+    public static CDocBuilderValue createNumberedSection(CDocBuilderValue api, String text, CDocBuilderValue numLvl) {
         CDocBuilderValue paragraph = createParagraph(api, text, true);
-        paragraph.call("SetNumbering", numberingLvl);
-        SetSpacingAfter(paragraph, 50);
+        setNumbering(paragraph, numLvl);
+        setSpacingAfter(paragraph, 50);
         return paragraph;
     }
 
     public static CDocBuilderValue createWorkCondition(CDocBuilderValue api, String title, String text, CDocBuilderValue numLvl, boolean setSpacing) {
         CDocBuilderValue paragraph = api.call("CreateParagraph");
-        SetNumbering(paragraph, numLvl);
+        setNumbering(paragraph, numLvl);
         if (setSpacing) {
-            SetSpacingAfter(paragraph, 20);
+            setSpacingAfter(paragraph, 20);
         }
         paragraph.call("SetJc", "left");
         paragraph.call("Push", createRun(api, title + ": ", true, defaultFontSize));
@@ -310,12 +313,8 @@ public class Program {
         CDocBuilderValue paragraph = cell.call("GetContent").call("GetElement", 0);
         paragraph.call("SetJc", "left");
         paragraph.call("Push", createRun(api, title, true, defaultFontSize));
-        String[] data = {
-                "Name: __________________________",
-                "Signature: _______________________",
-                "Date: ___________________________"
-        };
-        for (String text : data) {
+
+        for (String text : signerData) {
             paragraph.call("AddLineBreak");
             paragraph.call("Push", createRun(api, text, false, defaultFontSize));
         }

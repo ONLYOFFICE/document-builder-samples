@@ -36,7 +36,7 @@ const wchar_t* resultPath = L"result.pdf";
 
 const int defaultFontSize = 24;
 const string defaultJc = "both";
-const string signerData[] = {
+const vector<string>& signerData = {
     "Name: __________________________",
     "Signature: _______________________",
     "Date: ___________________________"
@@ -170,28 +170,142 @@ int main()
         api,
         participants,
         "Employee",
-        employee["name"].get<string>() + ", residing at " + employee["address"].get<string>() + "."
+        employee["full_name"].get<string>() + ", residing at " + employee["address"].get<string>() + "."
     );
     document.Call("Push", participants);
     document.Call("Push", createParagraph(api, "The parties agree to the following terms and conditions:"));
 
     // AGREEMENT CONDITIONS
     // Create numbering
-//    CValue numbering = document.Call("CreateNumbering", "numbered");
-//    CValue numberingLvl = numbering.Call("GetLevel", 0);
-//    numberingLvl.Call("SetCustomType", "decimal", "%1.", "left");
-//    numberingLvl.Call("SetSuff", "space");
+    CValue numbering = document.Call("CreateNumbering", "numbered");
+    CValue numberingLvl = numbering.Call("GetLevel", 0);
+    numberingLvl.Call("SetCustomType", "decimal", "%1.", "left");
+    numberingLvl.Call("SetSuff", "space");
 
     // Position and duties
-//    document.Call("Push", createNumberedSection(api, "POSITION AND DUTIES", numberingLvl));
-//    document.Call(
-//        "Push",
-//        createConditionsDescParagraph(
-//            api,
-//            "The Employee is hired as " + data["position_and_duties"]["job_title"].get<string>() + ". " +
-//            "The Employee shall perform their duties as outlined by the Employer and comply with all applicable policies and guidelines."
-//        )
-//    );
+    document.Call("Push", createNumberedSection(api, "POSITION AND DUTIES", numberingLvl));
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "The Employee is hired as " + data["position_and_duties"]["job_title"].get<string>() + 
+            ". The Employee shall perform their duties as outlined by the Employer and comply with all applicable policies and guidelines."
+        )
+    );
+
+    // Compensation
+    document.Call("Push", createNumberedSection(api, "COMPENSATION", numberingLvl));
+    const json& compensation = data["compensation"];
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "The Employee will receive a salary of " + to_string(compensation["salary"].get<int>()) + " " +
+            compensation["currency"].get<string>() + " " + compensation["frequency"].get<string>() + " (" + compensation["type"].get<string>() + "), " +
+            "payable in accordance with the Employer's payroll schedule and subject to lawful deductions."
+        )
+    );
+
+    // Probationary period
+    document.Call("Push", createNumberedSection(api, "PROBATIONARY PERIOD", numberingLvl));
+    const json& probPeriod = data["probationary_period"];
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "The Employee will serve a probationary period of " + probPeriod["duration"].get<string>() + 
+            ". During this period, the Employer may terminate this Agreement with " + 
+            probPeriod["terminate"].get<string>() + " days' notice if performance is deemed unsatisfactory."
+        )
+    );
+    
+    // Work conditions
+    document.Call("Push", createNumberedSection(api, "WORK CONDITIONS", numberingLvl));
+    CValue conditionsText = createConditionsDescParagraph(
+        api,
+        "The following terms apply to the Employee's working conditions:"
+    );
+    setSpacingAfter(conditionsText, 50);
+    document.Call("Push", conditionsText);
+    
+    // Create bullet numbering
+    CValue bulletNumbering = document.Call("CreateNumbering", "bullet");
+    CValue bulletNumLvl = bulletNumbering.Call("GetLevel", 0);
+
+    const json& workConditions = data["work_conditions"];
+    document.Call(
+        "Push",
+        createWorkCondition(api, "Working Hours", workConditions["working_hours"].get<string>(), bulletNumLvl, true)
+    );
+    document.Call(
+        "Push",
+        createWorkCondition(api, "Work Schedule", workConditions["work_schedule"].get<string>(), bulletNumLvl, true)
+    );
+    const vector<string>& benefitsArray = workConditions["benefits"];
+    string benefits = accumulate(
+        benefitsArray.begin(), benefitsArray.end(),
+        string{},
+        [](const string& a, const string& b) {
+            return a.empty() ? b : a + ", " + b;
+        }
+    );
+    document.Call("Push", createWorkCondition(api, "Benefits", benefits, bulletNumLvl, true));
+    const vector<string>& otherTermsArray = workConditions["other_terms"];
+    string otherTerms = accumulate(
+        otherTermsArray.begin(), otherTermsArray.end(),
+        string{},
+        [](const string& a, const string& b) {
+            return a.empty() ? b : a + ", " + b;
+        }
+    );
+    document.Call(
+     "Push",
+     createWorkCondition(api, "Other terms", otherTerms, bulletNumLvl, false)
+    );
+
+    // TERMINATION
+    document.Call("Push", createNumberedSection(api, "TERMINATION", numberingLvl));
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "Either party may terminate this Agreement by providing " + data["termination"]["notice_period"].get<string>() + 
+            " written notice. The Employer reserves the right to terminate employment immediately for cause, including but not limited to misconduct or breach of Agreement."
+        )
+    );
+
+    // GOVERNING LAW
+    document.Call("Push", createNumberedSection(api, "GOVERNING LAW", numberingLvl));
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "This Agreement is governed by the laws of " + data["governing_law"]["jurisdiction"].get<string>() + 
+            ", and any disputes arising under this Agreement will be resolved in accordance with these laws."
+        )
+    );
+
+    // ENTIRE AGREEMENT
+    document.Call("Push", createNumberedSection(api, "ENTIRE AGREEMENT", numberingLvl));
+    document.Call(
+        "Push",
+        createConditionsDescParagraph(
+            api,
+            "This document constitutes the entire Agreement between the parties and supersedes all prior agreements. Any amendments must be made in writing and signed by both parties."
+        )
+    );
+
+    // Signatures
+    CValue table = api.Call("CreateTable", 2, 2);
+    // set table properties
+    table.Call("SetWidth", "percent", 100);
+    // fill table
+    CValue tableTitle = table.Call("GetRow", 0);
+    CValue titleParagraph = tableTitle.Call("MergeCells").Call("GetContent").Call("GetElement", 0);
+    titleParagraph.Call("Push", createRun(api, "SIGNATURES", true, 24));
+    fillSigner(api, table.Call("GetCell", 1, 0), "Employer");
+    fillSigner(api, table.Call("GetCell", 1, 1), "Employee");
+    document.Call("Push", table);
 
     // Save and close
     builder.SaveFile(OFFICESTUDIO_FILE_DOCUMENT_OFORM_PDF, resultPath);
