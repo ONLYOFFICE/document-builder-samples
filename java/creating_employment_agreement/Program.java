@@ -45,7 +45,7 @@ public class Program {
 
     public static void createEmploymentAgreement(String resultPath, String resourcesDir) throws Exception {
         // parse JSON
-        String jsonPath = resourcesDir + "/data/employment_agreement_response.json";
+        String jsonPath = resourcesDir + "/data/employment_agreement_data.json";
         JSONObject data = (JSONObject)new JSONParser().parse(new FileReader(jsonPath));
 
         // init docbuilder and create new docx file

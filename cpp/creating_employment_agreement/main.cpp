@@ -36,15 +36,14 @@ const wchar_t* resultPath = L"result.pdf";
 
 const int defaultFontSize = 24;
 const string defaultJc = "both";
-const vector<string>& signerData = {
+const string signerData[] = {
     "Name: __________________________",
     "Signature: _______________________",
     "Date: ___________________________"
 };
 
 // Helper functions
-CValue createParagraph(CValue api, string text, bool isBold = false, int fontSize = defaultFontSize, string jc = defaultJc)
-{
+CValue createParagraph(CValue api, string text, bool isBold = false, int fontSize = defaultFontSize, string jc = defaultJc) {
     CValue paragraph = api.Call("CreateParagraph");
     paragraph.Call("AddText", text.c_str());
     paragraph.Call("SetBold", isBold);
@@ -117,11 +116,21 @@ void fillSigner(CValue api, CValue cell, string title) {
     }
 }
 
+string stringJoin(const vector<string>& strArray) {
+    string resultString = accumulate(
+        strArray.begin(), strArray.end(),
+        string{},
+        [](const string& a, const string& b) {
+            return a.empty() ? b : a + ", " + b;
+        }
+    );
+    return resultString;
+}
+
 // Main function
-int main()
-{
+int main() {
     // parse JSON
-    string jsonPath = U_TO_UTF8(NSUtils::GetResourcesDirectory()) + "/data/employment_agreement_response.json";
+    string jsonPath = U_TO_UTF8(NSUtils::GetResourcesDirectory()) + "/data/employment_agreement_data.json";
     ifstream fs(jsonPath);
     json data = json::parse(fs);
 
@@ -188,7 +197,7 @@ int main()
         "Push",
         createConditionsDescParagraph(
             api,
-            "The Employee is hired as " + data["position_and_duties"]["job_title"].get<string>() + 
+            "The Employee is hired as " + data["position_and_duties"]["job_title"].get<string>() +
             ". The Employee shall perform their duties as outlined by the Employer and comply with all applicable policies and guidelines."
         )
     );
@@ -213,12 +222,12 @@ int main()
         "Push",
         createConditionsDescParagraph(
             api,
-            "The Employee will serve a probationary period of " + probPeriod["duration"].get<string>() + 
-            ". During this period, the Employer may terminate this Agreement with " + 
+            "The Employee will serve a probationary period of " + probPeriod["duration"].get<string>() +
+            ". During this period, the Employer may terminate this Agreement with " +
             probPeriod["terminate"].get<string>() + " days' notice if performance is deemed unsatisfactory."
         )
     );
-    
+
     // Work conditions
     document.Call("Push", createNumberedSection(api, "WORK CONDITIONS", numberingLvl));
     CValue conditionsText = createConditionsDescParagraph(
@@ -227,7 +236,7 @@ int main()
     );
     setSpacingAfter(conditionsText, 50);
     document.Call("Push", conditionsText);
-    
+
     // Create bullet numbering
     CValue bulletNumbering = document.Call("CreateNumbering", "bullet");
     CValue bulletNumLvl = bulletNumbering.Call("GetLevel", 0);
@@ -242,25 +251,13 @@ int main()
         createWorkCondition(api, "Work Schedule", workConditions["work_schedule"].get<string>(), bulletNumLvl, true)
     );
     const vector<string>& benefitsArray = workConditions["benefits"];
-    string benefits = accumulate(
-        benefitsArray.begin(), benefitsArray.end(),
-        string{},
-        [](const string& a, const string& b) {
-            return a.empty() ? b : a + ", " + b;
-        }
-    );
+    string benefits = stringJoin(benefitsArray);
     document.Call("Push", createWorkCondition(api, "Benefits", benefits, bulletNumLvl, true));
     const vector<string>& otherTermsArray = workConditions["other_terms"];
-    string otherTerms = accumulate(
-        otherTermsArray.begin(), otherTermsArray.end(),
-        string{},
-        [](const string& a, const string& b) {
-            return a.empty() ? b : a + ", " + b;
-        }
-    );
+    string otherTerms = stringJoin(otherTermsArray);
     document.Call(
-     "Push",
-     createWorkCondition(api, "Other terms", otherTerms, bulletNumLvl, false)
+        "Push",
+        createWorkCondition(api, "Other terms", otherTerms, bulletNumLvl, false)
     );
 
     // TERMINATION
@@ -269,7 +266,7 @@ int main()
         "Push",
         createConditionsDescParagraph(
             api,
-            "Either party may terminate this Agreement by providing " + data["termination"]["notice_period"].get<string>() + 
+            "Either party may terminate this Agreement by providing " + data["termination"]["notice_period"].get<string>() +
             " written notice. The Employer reserves the right to terminate employment immediately for cause, including but not limited to misconduct or breach of Agreement."
         )
     );
@@ -280,7 +277,7 @@ int main()
         "Push",
         createConditionsDescParagraph(
             api,
-            "This Agreement is governed by the laws of " + data["governing_law"]["jurisdiction"].get<string>() + 
+            "This Agreement is governed by the laws of " + data["governing_law"]["jurisdiction"].get<string>() +
             ", and any disputes arising under this Agreement will be resolved in accordance with these laws."
         )
     );

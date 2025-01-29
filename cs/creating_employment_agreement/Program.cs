@@ -32,12 +32,12 @@ namespace Sample
     {
         const int defaultFontSize = 24;
         const string defaultJc = "both";
-        static readonly List<string> signerData = new List<string> {
+        static readonly string[] signerData = {
             "Name: __________________________",
             "Signature: _______________________",
             "Date: ___________________________"
         };
-    
+
         public static void Main()
         {
             string workDirectory = Constants.BUILDER_DIR;
@@ -53,7 +53,7 @@ namespace Sample
         public static void CreateEmploymentAgreement(string workDirectory, string resultPath, string resourcesDir)
         {
             // parse JSON
-            string jsonPath = resourcesDir + "/data/employment_agreement_response.json";
+            string jsonPath = resourcesDir + "/data/employment_agreement_data.json";
             string json = File.ReadAllText(jsonPath);
             JsonData data = JsonSerializer.Deserialize<JsonData>(json);
 
@@ -143,11 +143,11 @@ namespace Sample
                 CreateConditionsDescParagraph(
                     api,
                     $"The Employee will serve a probationary period of {data.probationary_period.duration}. " +
-                    "During this period, the Employer may terminate this Agreement with " + 
+                    "During this period, the Employer may terminate this Agreement with " +
                     $"{data.probationary_period.terminate} days' notice if performance is deemed unsatisfactory."
                 )
             );
-            
+
             // Work conditions
             document.Call("Push", CreateNumberedSection(api, "WORK CONDITIONS", numberingLvl));
             CValue conditionsText = CreateConditionsDescParagraph(
@@ -156,7 +156,7 @@ namespace Sample
             );
             SetSpacingAfter(conditionsText, 50);
             document.Call("Push", conditionsText);
-            
+
             // Create bullet numbering
             CValue bulletNumbering = document.Call("CreateNumbering", "bullet");
             CValue bulletNumLvl = bulletNumbering.Call("GetLevel", 0);
@@ -170,7 +170,7 @@ namespace Sample
                 CreateWorkCondition(api, "Work Schedule", data.work_conditions.work_schedule, bulletNumLvl, true)
             );
             document.Call(
-                "Push", 
+                "Push",
                 CreateWorkCondition(api, "Benefits", string.Join(", ", data.work_conditions.benefits), bulletNumLvl, true)
             );
             document.Call(
@@ -243,7 +243,7 @@ namespace Sample
             return paragraph;
         }
 
-        public static CValue CreateRun(CValue api, string text, bool isBold = false, int fontSize = defaultFontSize) 
+        public static CValue CreateRun(CValue api, string text, bool isBold = false, int fontSize = defaultFontSize)
         {
             CValue run = api.Call("CreateRun");
             run.Call("AddText", text);
@@ -254,17 +254,17 @@ namespace Sample
             return run;
         }
 
-        public static void SetNumbering(CValue paragraph, CValue numLvl) 
+        public static void SetNumbering(CValue paragraph, CValue numLvl)
         {
             paragraph.Call("SetNumbering", numLvl);
         }
 
-        public static void SetSpacingAfter(CValue paragraph, int spacing) 
+        public static void SetSpacingAfter(CValue paragraph, int spacing)
         {
             paragraph.Call("SetSpacingAfter", spacing);
         }
 
-        public static CValue CreateConditionsDescParagraph(CValue api, string text) 
+        public static CValue CreateConditionsDescParagraph(CValue api, string text)
         {
             // create paragraph with first line indentation
             CValue paragraph = CreateParagraph(api, text);
@@ -272,13 +272,13 @@ namespace Sample
             return paragraph;
         }
 
-        public static void AddParticipantToParagraph(CValue api, CValue paragraph, string pType, string details) 
+        public static void AddParticipantToParagraph(CValue api, CValue paragraph, string pType, string details)
         {
             paragraph.Call("Push", CreateRun(api, pType + ": ", true));
             paragraph.Call("Push", CreateRun(api, details));
         }
 
-        public static CValue CreateNumberedSection(CValue api, string text, CValue numLvl) 
+        public static CValue CreateNumberedSection(CValue api, string text, CValue numLvl)
         {
             CValue paragraph = CreateParagraph(api, text, true);
             SetNumbering(paragraph, numLvl);
@@ -286,7 +286,7 @@ namespace Sample
             return paragraph;
         }
 
-        public static CValue CreateWorkCondition(CValue api, string title, string text, CValue numLvl, bool setSpacing = false) 
+        public static CValue CreateWorkCondition(CValue api, string title, string text, CValue numLvl, bool setSpacing = false)
         {
             CValue paragraph = api.Call("CreateParagraph");
             SetNumbering(paragraph, numLvl);
@@ -299,7 +299,7 @@ namespace Sample
             return paragraph;
         }
 
-        public static void FillSigner(CValue api, CValue cell, string title) 
+        public static void FillSigner(CValue api, CValue cell, string title)
         {
             CValue paragraph = cell.Call("GetContent").Call("GetElement", 0);
             paragraph.Call("SetJc", "left");
@@ -315,7 +315,7 @@ namespace Sample
     // Define classes to represent the JSON structure
     public class JsonData
     {
-        public string date { get; set; }
+       public string date { get; set; }
        public Employer employer { get; set; }
        public Employee employee { get; set; }
        public PositionAndDuties position_and_duties { get; set; }
@@ -338,12 +338,12 @@ namespace Sample
         public string address { get; set; }
     }
 
-    public class PositionAndDuties 
+    public class PositionAndDuties
     {
         public string job_title { get; set; }
     }
 
-    public class Compensation 
+    public class Compensation
     {
         public int salary { get; set; }
         public string currency { get; set; }
@@ -351,13 +351,13 @@ namespace Sample
         public string type { get; set; }
     }
 
-    public class ProbationaryPeriod 
+    public class ProbationaryPeriod
     {
         public string duration { get; set; }
         public string terminate { get; set; }
     }
 
-    public class WorkConditions 
+    public class WorkConditions
     {
         public string working_hours { get; set; }
         public string work_schedule { get; set; }
@@ -365,12 +365,12 @@ namespace Sample
         public List<string> other_terms { get; set; }
     }
 
-    public class Termination 
+    public class Termination
     {
         public string notice_period { get; set; }
     }
 
-    public class GoverningLaw 
+    public class GoverningLaw
     {
         public string jurisdiction { get; set; }
     }

@@ -98,7 +98,7 @@ def fill_signer(api, cell, title):
 if __name__ == '__main__':
     resources_dir = os.path.normpath('../../resources')
     # parse JSON
-    with open(os.path.join(resources_dir, 'data/employment_agreement_response.json'), 'r') as file_json:
+    with open(os.path.join(resources_dir, 'data/employment_agreement_data.json'), 'r') as file_json:
         data = json.load(file_json)
 
     # init docbuilder and create new docx file
