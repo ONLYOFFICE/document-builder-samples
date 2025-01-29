@@ -3,6 +3,7 @@ out/
 *.docx
 *.pptx
 *.xlsx
+*.pdf
 *.class
 
 .vscode
