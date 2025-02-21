@@ -1,0 +1,42 @@
+{
+    "invoice": {
+        "number": "2025-001",
+        "date": "2025-01-16"
+    },
+    "seller": {
+        "company_name": "BrightTech Solutions LLC",
+        "address": "123 Innovation Drive, San Francisco, CA 94103, USA",
+        "tin": "123456789",
+        "bank_details": {
+            "bank_name": "First National Bank",
+            "account_number": "9876543210",
+            "swift_code": "FNBUS33"
+        },
+        "authorized_person": "Sophia Turner",
+        "position": "Accounts Payable Manager"
+    },
+    "buyer": {
+        "company_name": "Innovative Systems Inc.",
+        "address": "789 Enterprise Blvd, New York, NY 10001, USA",
+        "tin": "987654321"
+    },
+    "items": [
+        {
+            "description": "Cloud Hosting Service - Monthly Plan",
+            "quantity": 1,
+            "unit_price": 200,
+            "total": 200
+        },
+        {
+            "description": "Additional Storage - 50GB",
+            "quantity": 2,
+            "unit_price": 50,
+            "total": 100
+        }
+    ],
+    "totals": {
+        "subtotal": 300,
+        "tax": 60,
+        "total_due": 360
+    }
+}
