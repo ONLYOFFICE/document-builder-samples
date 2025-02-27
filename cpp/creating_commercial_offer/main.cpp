@@ -185,6 +185,10 @@ int main() {
     CValue api = global["Api"];
     CValue document = api.Call("GetDocument");
 
+    // page margins
+    CValue section = document.Call("GetFinalSection");
+    section.Call("SetPageMargins", 1440, 1280, 1440, 1280);
+
     // DOCUMENT STYLE
     CValue paraPr = document.Call("GetDefaultParaPr");
     paraPr.Call("SetSpacingAfter", 100);

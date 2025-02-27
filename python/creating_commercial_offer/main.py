@@ -144,6 +144,10 @@ if __name__ == '__main__':
     api = global_obj['Api']
     document = api.Call('GetDocument')
 
+    # page margins
+    section = document.Call('GetFinalSection')
+    section.Call('SetPageMargins', 1440, 1280, 1440, 1280)
+
     # DOCUMENT STYLE
     para_pr = document.Call('GetDefaultParaPr')
     para_pr.Call('SetSpacingAfter', 100)

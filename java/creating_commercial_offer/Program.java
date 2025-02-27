@@ -53,6 +53,10 @@ public class Program {
         CDocBuilderValue api = global.get("Api");
         CDocBuilderValue document = api.call("GetDocument");
 
+        // page margins
+        CDocBuilderValue section = document.call("GetFinalSection");
+        section.call("SetPageMargins", 1440, 1280, 1440, 1280);
+
         // DOCUMENT STYLE
         CDocBuilderValue paraPr = document.call("GetDefaultParaPr");
         paraPr.call("SetSpacingAfter", 100);
