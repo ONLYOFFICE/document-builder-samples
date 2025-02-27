@@ -147,7 +147,7 @@ public class Program {
 
         // table content
         JSONArray offerDetails = (JSONArray) data.get("offer_details");
-        CDocBuilderValue itemsTable = api.call("CreateTable", 4, offerDetails.size() + 2);
+        CDocBuilderValue itemsTable = api.call("CreateTable", 4, offerDetails.size() + 1);
         document.call("Push", itemsTable);
         setupTableStyle(document, itemsTable);
         fillTableContent(itemsTable, offerDetails);
@@ -334,13 +334,6 @@ public class Program {
                     cell.call("AddText", item.get(fieldName).toString());
                 }
             }
-        }
-
-        // fill last row with dots
-        CDocBuilderValue lastRow = table.call("GetRow", items.size() + 1);
-        for (int j = 0; j < tableFields.length; j++) {
-            CDocBuilderValue cell = getCellContent(lastRow.call("GetCell", j));
-            cell.call("AddText", "...");
         }
     }
 }

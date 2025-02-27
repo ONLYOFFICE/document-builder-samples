@@ -121,12 +121,6 @@ def fill_table_content(table, items):
                 case _:
                     cell.Call('AddText', str(items[i][key]))
 
-    # fill last row with dots
-    row = table.Call('GetRow', len(items) + 1)
-    for j, key in enumerate(table_fields):
-        cell = get_cell_content(row.Call('GetCell', j))
-        cell.Call('AddText', '...')
-
 
 if __name__ == '__main__':
     resources_dir = os.path.normpath('../../resources')
@@ -239,7 +233,7 @@ if __name__ == '__main__':
     document.Call('Push', table_header)
 
     # table content
-    items_table = api.Call('CreateTable', 4, len(data["offer_details"]) + 2)
+    items_table = api.Call('CreateTable', 4, len(data["offer_details"]) + 1)
     document.Call('Push', items_table)
     setup_table_style(document, items_table)
     fill_table_content(items_table, data["offer_details"])

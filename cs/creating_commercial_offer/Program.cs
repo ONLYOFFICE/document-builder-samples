@@ -151,7 +151,7 @@ namespace Sample
 
             // table content
             List<OfferDetail> offerDetails = data.offer_details;
-            CValue itemsTable = api.Call("CreateTable", 4, offerDetails.Count + 2);
+            CValue itemsTable = api.Call("CreateTable", 4, offerDetails.Count + 1);
             document.Call("Push", itemsTable);
             SetupTableStyle(document, itemsTable);
             FillTableContent(itemsTable, offerDetails);
@@ -363,14 +363,6 @@ namespace Sample
                         cell.Call("AddText", strValue);
                     }
                 }
-            }
-
-            // fill last row with dots
-            CValue lastRow = table.Call("GetRow", items.Count + 1);
-            for (int j = 0; j < tableFields.Length; j++)
-            {
-                CValue cell = GetCellContent(lastRow.Call("GetCell", j));
-                cell.Call("AddText", "...");
             }
         }
     }

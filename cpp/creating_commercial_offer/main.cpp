@@ -160,13 +160,6 @@ void fillTableContent(CValue table, json& items) {
             }
         }
     }
-
-    // fill last row with dots
-    CValue lastRow = table.Call("GetRow", (int)items.size() + 1);
-    for (int j = 0; j < tableFieldsSize; j++) {
-        CValue cell = getCellContent(lastRow.Call("GetCell", j));
-        cell.Call("AddText", "...");
-    }
 }
 
 int main() {
@@ -275,7 +268,7 @@ int main() {
 
     // table content
     json offerDetails = data["offer_details"];
-    CValue itemsTable = api.Call("CreateTable", 4, (int)offerDetails.size() + 2);
+    CValue itemsTable = api.Call("CreateTable", 4, (int)offerDetails.size() + 1);
     document.Call("Push", itemsTable);
     setupTableStyle(document, itemsTable);
     fillTableContent(itemsTable, offerDetails);
