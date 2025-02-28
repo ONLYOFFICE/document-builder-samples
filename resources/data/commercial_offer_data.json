@@ -1,0 +1,51 @@
+{
+    "offer": {
+        "number": "2025-001",
+        "date": "2025-01-16"
+    },
+    "seller": {
+        "company_name": "BrightTech Solutions LLC",
+        "address": "123 Innovation Drive, San Francisco, CA 94103, USA",
+        "tin": "123456789",
+        "contact": {
+            "phone": "+1 555-123-4567",
+            "email": "sales@brighttech.com"
+        },
+        "authorized_person": {
+            "full_name": "Johnathan Reynolds",
+            "position": "Sales Director"
+        }
+    },
+    "buyer": {
+        "company_name": "Innovative Systems Inc.",
+        "address": "789 Enterprise Blvd, New York, NY 10001, USA",
+        "contact_person": "Jane Doe",
+        "email": "jane.doe@innovativesystems.com"
+    },
+    "offer_details": [
+        {
+            "description": "Business Analysis Service",
+            "quantity": 2,
+            "unit_price": 5000,
+            "total": 10000
+        },
+        {
+            "description": "Custom Software Development",
+            "quantity": 1,
+            "unit_price": 15000,
+            "total": 15000
+        }
+    ],
+    "totals": {
+        "subtotal": 20000,
+        "discount": 2000,
+        "tax": 3600,
+        "total": 21600
+    },
+    "terms_and_conditions": {
+        "validity_period": "2025-01-31",
+        "payment_terms": "50% advance, balance upon delivery",
+        "delivery_terms": "Free on Board (FOB)",
+        "additional_notes": "The project will commence within 10 business days after the advance payment."
+    }
+}
