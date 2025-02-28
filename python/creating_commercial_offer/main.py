@@ -259,7 +259,7 @@ if __name__ == '__main__':
     )
 
     # TERMS AND CONDITIONS
-    seller_header = create_details_header(api, 'SELLER INFORMATION')
+    seller_header = create_details_header(api, 'TERMS AND CONDITIONS')
     document.Call('Push', seller_header)
 
     # numbering

@@ -18,11 +18,8 @@
 
 #include <fstream>
 #include <string>
-#include <algorithm>
-#include <iostream>
 #include <locale>
 #include <sstream>
-#include <iomanip>
 
 #include "common.h"
 #include "docbuilder.h"
@@ -74,7 +71,7 @@ void setupRequisitesStyle(CValue paragraph, CValue numLvl, bool setSpacing) {
 string formatSum(int value) {
     std::ostringstream oss;
     oss.imbue(std::locale("en_US.UTF-8"));
-    oss << "$" << std::fixed << std::setprecision(0) << value;
+    oss << "$" << value;
     return oss.str();
 }
 
@@ -90,11 +87,6 @@ CValue createRequisitesParagraph(CValue api, string title, string details, CValu
     detailsRun.Call("SetItalic", true);
     setupRequisitesStyle(paragraph, numLvl, setSpacing);
     return paragraph;
-}
-
-CValue createRequisitesParagraph(CValue api, string title, int details, CValue numLvl = CValue::CreateUndefined(), bool setSpacing = true, bool setTitleBold = true) {
-    string formattedDetails = formatSum(details);
-    return createRequisitesParagraph(api, title, formattedDetails, numLvl, setSpacing, setTitleBold);
 }
 
 void setupTableStyle(CValue document, CValue table) {
@@ -196,7 +188,7 @@ int main() {
     // document requisites
     document.Call(
         "Push",
-        createRequisitesParagraph(api, "Offer No.", data["offer"]["number"].get<string>(), CValue::CreateUndefined())
+        createRequisitesParagraph(api, "Offer No.", data["offer"]["number"].get<string>())
     );
     document.Call(
         "Push",
@@ -278,23 +270,23 @@ int main() {
     document.Call("Push", totals);
     document.Call(
         "Push",
-        createRequisitesParagraph(api, "Subtotal", data["totals"]["subtotal"].get<int>(), bNumLvl)
+        createRequisitesParagraph(api, "Subtotal", formatSum(data["totals"]["subtotal"].get<int>()), bNumLvl)
     );
     document.Call(
         "Push",
-        createRequisitesParagraph(api, "Discount", data["totals"]["discount"].get<int>(), bNumLvl)
+        createRequisitesParagraph(api, "Discount", formatSum(data["totals"]["discount"].get<int>()), bNumLvl)
     );
     document.Call(
         "Push",
-        createRequisitesParagraph(api, "Tax (e.g., 20% VAT)", data["totals"]["tax"].get<int>(), bNumLvl)
+        createRequisitesParagraph(api, "Tax (e.g., 20% VAT)", formatSum(data["totals"]["tax"].get<int>()), bNumLvl)
     );
     document.Call(
         "Push",
-        createRequisitesParagraph(api, "Total Amount", data["totals"]["total"].get<int>(), bNumLvl, false)
+        createRequisitesParagraph(api, "Total Amount", formatSum(data["totals"]["total"].get<int>()), bNumLvl, false)
     );
 
     // TERMS AND CONDITIONS
-    CValue sellerHeader2 = createDetailsHeader(api, "SELLER INFORMATION");
+    CValue sellerHeader2 = createDetailsHeader(api, "TERMS AND CONDITIONS");
     document.Call("Push", sellerHeader2);
 
     // numbering

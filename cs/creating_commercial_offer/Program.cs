@@ -79,7 +79,7 @@ namespace Sample
             // document requisites
             document.Call(
                 "Push",
-                CreateRequisitesParagraph(api, "Offer No.", data.offer.number, CValue.CreateUndefined())
+                CreateRequisitesParagraph(api, "Offer No.", data.offer.number)
             );
             document.Call(
                 "Push",
@@ -161,23 +161,23 @@ namespace Sample
             document.Call("Push", totals);
             document.Call(
                 "Push",
-                CreateRequisitesParagraph(api, "Subtotal", data.totals.subtotal, bNumLvl)
+                CreateRequisitesParagraph(api, "Subtotal", FormatSum(data.totals.subtotal), bNumLvl)
             );
             document.Call(
                 "Push",
-                CreateRequisitesParagraph(api, "Discount", data.totals.discount, bNumLvl)
+                CreateRequisitesParagraph(api, "Discount", FormatSum(data.totals.discount), bNumLvl)
             );
             document.Call(
                 "Push",
-                CreateRequisitesParagraph(api, "Tax (e.g., 20% VAT)", data.totals.tax, bNumLvl)
+                CreateRequisitesParagraph(api, "Tax (e.g., 20% VAT)", FormatSum(data.totals.tax), bNumLvl)
             );
             document.Call(
                 "Push",
-                CreateRequisitesParagraph(api, "Total Amount", data.totals.total, bNumLvl, false)
+                CreateRequisitesParagraph(api, "Total Amount", FormatSum(data.totals.total), bNumLvl, false)
             );
 
             // TERMS AND CONDITIONS
-            CValue sellerHeader2 = CreateDetailsHeader(api, "SELLER INFORMATION");
+            CValue sellerHeader2 = CreateDetailsHeader(api, "TERMS AND CONDITIONS");
             document.Call("Push", sellerHeader2);
 
             // numbering
@@ -265,7 +265,7 @@ namespace Sample
 
         public static string FormatSum(int value)
         {
-            CultureInfo culture = new CultureInfo("en-US");
+            CultureInfo culture = new ("en-US");
             return value.ToString("C0", culture);
         }
 
@@ -290,12 +290,6 @@ namespace Sample
             detailsRun.Call("SetItalic", true);
             SetupRequisitesStyle(paragraph, numLvl, setSpacing);
             return paragraph;
-        }
-
-        public static CValue CreateRequisitesParagraph(CValue api, string title, int details, CValue numLvl = null, bool setSpacing = true, bool setTitleBold = true)
-        {
-            string formattedDetails = FormatSum(details);
-            return CreateRequisitesParagraph(api, title, formattedDetails, numLvl, setSpacing, setTitleBold);
         }
 
         public static void SetupTableStyle(CValue document, CValue table)
