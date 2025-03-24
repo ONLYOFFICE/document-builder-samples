@@ -1,0 +1,34 @@
+[
+    {
+        "user_id": "U123",
+        "date": "2024-01-10",
+        "answers": {
+            "How would you rate our service?": {"rating": 5, "comment": "Excellent, I liked everything!"},
+            "Would you recommend us to your friends?": {"rating": 4, "comment": "Probably yes."}
+        }
+    },
+    {
+        "user_id": "U124",
+        "date": "2024-01-12",
+        "answers": {
+            "How would you rate our service?": {"rating": 2, "comment": "Inconvenient interface."},
+            "Would you recommend us to your friends?": {"rating": 1, "comment": "Absolutely not, terrible."}
+        }
+    },
+    {
+        "user_id": "U125",
+        "date": "2024-02-01",
+        "answers": {
+            "How would you rate our service?": {"rating": 3, "comment": "Average level."},
+            "Would you recommend us to your friends?": {"rating": 3, "comment": "Maybe."}
+        }
+    },
+    {
+        "user_id": "U126",
+        "date": "2024-02-15",
+        "answers": {
+            "How would you rate our service?": {"rating": 1, "comment": "Terrible service."},
+            "Would you recommend us to your friends?": {"rating": 2, "comment": "Definitely not."}
+        }
+    }
+]
