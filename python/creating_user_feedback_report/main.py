@@ -27,6 +27,18 @@ import json
 import os
 
 
+def get_grey_color(api):
+    return api.Call('CreateRGBColor', 128, 128, 128)
+
+
+def get_blue_color(api):
+    return api.Call('CreateRGBColor', 91, 155, 213)
+
+
+def get_orange_color(api):
+    return api.Call('CreateRGBColor', 237, 125, 49)
+
+
 def set_table_style(range):
     range.Call('SetRowHeight', 24)
     range.Call('SetAlignVertical', 'center')
@@ -40,24 +52,19 @@ def set_table_style(range):
     range.Call('SetBorders', 'InsideHorizontal', line_style, color)
     range.Call('SetBorders', 'InsideVertical', line_style, color)
 
-def get_average_values(feedback_data):
-    result = {}
-    for item in feedback_data:
-        for key, value in item['answers'].items():
-            if key not in result:
-                result[key] = [value['rating']]
-            else:
-                result[key].append(value['rating'])
-
-    average = [['Question', 'Average Rating', 'Number of Responses']]
-    for key, value in result.items():
-        average.append([key, round(sum(value) / len(value), 1), len(value)])
-
-    return average
-
 
 def fill_average_sheet(worksheet, feedback_data):
-    average_values = get_average_values(feedback_data)
+    average_values = [['Question', 'Average Rating', 'Number of Responses']]
+    result = {}
+    for record in feedback_data:
+        for item in record['feedback']:
+            if item['question'] not in result:
+                result[item['question']] = [item['answer']['rating']]
+            else:
+                result[item['question']].append(item['answer']['rating'])
+    for key, value in result.items():
+        average_values.append([key, round(sum(value) / len(value), 1), len(value)])
+
     cols_count = len(average_values[0]) - 1
     start_sell = worksheet.Call('GetRangeByNumber', 0, 0)
     end_cell = worksheet.Call('GetRangeByNumber', len(average_values) - 1, cols_count)
@@ -85,14 +92,14 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
     header_row.Call('SetBold', True)
 
     rows_count = 1
-    for item in feedback_data:
+    for record in feedback_data:
         # Count and fill user feedback
         user_feedback = []
-        rating = 0
-        for key, value in item['answers'].items():
-            user_feedback.append([key, value['comment'], value['rating']])
-            rating += value['rating']
-        
+        avg_rating = 0
+        for item in record['feedback']:
+            user_feedback.append([item['question'], item['answer']['comment'], item['answer']['rating']])
+            avg_rating += item['answer']['rating']
+
         user_rows_count = len(user_feedback) - 1
         # Fill date
         rating_cell = worksheet.Call(
@@ -101,7 +108,7 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
             worksheet.Call('GetRangeByNumber', rows_count + user_rows_count, 0),
         )
         rating_cell.Call('Merge', False)
-        rating_cell.Call('SetValue', item['date'])
+        rating_cell.Call('SetValue', record['date'])
 
         # Fill ratings
         user_range = worksheet.Call(
@@ -112,17 +119,17 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
         user_range.Call('SetValue', user_feedback)
 
         # Count average rating
-        rating = round(rating/len(user_feedback), 1)
+        avg_rating = round(avg_rating / len(user_feedback), 1)
         rating_cell = worksheet.Call(
             'GetRange',
             worksheet.Call('GetRangeByNumber', rows_count, cols_count),
             worksheet.Call('GetRangeByNumber', rows_count + user_rows_count, cols_count),
         )
         rating_cell.Call('Merge', False)
-        rating_cell.Call('SetValue', rating)
+        rating_cell.Call('SetValue', avg_rating)
 
         # If rating <= 2, highlight it
-        if rating <= 2:
+        if avg_rating <= 2:
             worksheet.Call(
                 'GetRange',
                 worksheet.Call('GetRangeByNumber', rows_count, 0),
@@ -156,17 +163,30 @@ def create_column_chart(worksheet, data_range, title):
     chart.Call('SetTitle', title, 16)
 
 
-def create_line_chart(api, worksheet, data_range, title):
-    chart = worksheet.Call('AddChart', data_range, False, 'scatter', 2, 135.38 * 36000, 81.28 * 36000)
+def create_line_chart(api, worksheet, data, title):
+    average_day_rating = [['Date', 'Rating']]
+    result = {}
+    for record in data:
+        if record['date'] not in result.keys():
+            result[record['date']] = []
+        for item in record['feedback']:
+            result[record['date']].append(item['answer']['rating'])
+    for key, value in result.items():
+        average_day_rating.append([key, round(sum(value) / len(value), 1)])
+
+    data_range = f'$E$1:$F${len(average_day_rating)}'
+    worksheet.Call('GetRange', data_range).Call('SetValue', average_day_rating)
+    chart = worksheet.Call('AddChart', f'Charts!{data_range}', False, 'scatter', 2, 135.38 * 36000, 81.28 * 36000)
     chart.Call('SetPosition', 0, 0, 18, 0)
+    chart.Call('SetSeriesFill', get_blue_color(api), 0, False)
     stroke = api.Call(
         'CreateStroke',
         0.5 * 36000,
-        api.Call('CreateSolidFill', api.Call('CreateRGBColor', 128, 128, 128)),
+        api.Call('CreateSolidFill', get_grey_color(api)),
     )
     chart.Call('SetSeriesOutLine', stroke, 0, False)
     chart.Call('SetTitle', title, 16)
-    chart.Call('SetMajorHorizontalGridlines', api.Call('CreateStroke', 0,  api.Call('CreateNoFill')))
+    chart.Call('SetMajorHorizontalGridlines', api.Call('CreateStroke', 0, api.Call('CreateNoFill')))
 
 
 def create_pie_chart(api, worksheet, data_range, title):
@@ -180,9 +200,9 @@ def create_pie_chart(api, worksheet, data_range, title):
     chart = worksheet.Call('AddChart', 'Charts!$A$1:$C$2', True, 'pie', 2, 135.38 * 36000, 81.28 * 36000)
     chart.Call('SetPosition', 9, 0, 0, 0)
     chart.Call('SetTitle', title, 16)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', api.Call('CreateRGBColor', 237, 125, 49)), 0, 0)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', api.Call('CreateRGBColor', 128, 128, 128)), 0, 1)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', api.Call('CreateRGBColor', 91, 155, 213)), 0, 2)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_orange_color(api)), 0, 0)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_grey_color(api)), 0, 1)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_blue_color(api)), 0, 2)
     stroke = api.Call(
         'CreateStroke',
         0.5 * 36000,
@@ -225,12 +245,7 @@ if __name__ == '__main__':
     api.Call('AddSheet', 'Charts')
     worksheet3 = api.Call('GetActiveSheet')
     create_column_chart(worksheet3, f'Average!$A$2:$B${table1_rows_count}', 'Average ratings')
-    create_line_chart(
-        api,
-        worksheet3,
-        f'Comments!$A$1:$A${table2_rows_count},Comments!$E$1:$E${table2_rows_count}',
-        'Dynamics of the average ratings',
-    )
+    create_line_chart(api, worksheet3, data, 'Dynamics of the average ratings')
     create_pie_chart(api, worksheet3, f'Comments!$D$1:$D${table2_rows_count}', 'Shares of reviews')
 
     # Set first worksheet active
