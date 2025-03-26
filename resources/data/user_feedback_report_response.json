@@ -93,8 +93,8 @@
             {
                 "question": "Would you recommend us to your friends?",
                 "answer": {
-                    "rating": 5,
-                    "comment": "Yes, I think they would like it!"
+                    "rating": 4,
+                    "comment": "Yes, I think they would like it"
                 }
             }
         ]

@@ -27,30 +27,17 @@ import json
 import os
 
 
-def get_grey_color(api):
-    return api.Call('CreateRGBColor', 128, 128, 128)
-
-
-def get_blue_color(api):
-    return api.Call('CreateRGBColor', 91, 155, 213)
-
-
-def get_orange_color(api):
-    return api.Call('CreateRGBColor', 237, 125, 49)
-
-
 def set_table_style(range):
     range.Call('SetRowHeight', 24)
     range.Call('SetAlignVertical', 'center')
 
-    color = api.Call('CreateColorFromRGB', 0, 0, 0)
     line_style = 'Thin'
-    range.Call('SetBorders', 'Top', line_style, color)
-    range.Call('SetBorders', 'Left', line_style, color)
-    range.Call('SetBorders', 'Right', line_style, color)
-    range.Call('SetBorders', 'Bottom', line_style, color)
-    range.Call('SetBorders', 'InsideHorizontal', line_style, color)
-    range.Call('SetBorders', 'InsideVertical', line_style, color)
+    range.Call('SetBorders', 'Top', line_style, color_black)
+    range.Call('SetBorders', 'Left', line_style, color_black)
+    range.Call('SetBorders', 'Right', line_style, color_black)
+    range.Call('SetBorders', 'Bottom', line_style, color_black)
+    range.Call('SetBorders', 'InsideHorizontal', line_style, color_black)
+    range.Call('SetBorders', 'InsideVertical', line_style, color_black)
 
 
 def fill_average_sheet(worksheet, feedback_data):
@@ -101,14 +88,16 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
             avg_rating += item['answer']['rating']
 
         user_rows_count = len(user_feedback) - 1
+        avg_rating = round(avg_rating / len(user_feedback), 1)
+
         # Fill date
-        rating_cell = worksheet.Call(
+        date_cell = worksheet.Call(
             'GetRange',
             worksheet.Call('GetRangeByNumber', rows_count, 0),
             worksheet.Call('GetRangeByNumber', rows_count + user_rows_count, 0),
         )
-        rating_cell.Call('Merge', False)
-        rating_cell.Call('SetValue', record['date'])
+        date_cell.Call('Merge', False)
+        date_cell.Call('SetValue', record['date'])
 
         # Fill ratings
         user_range = worksheet.Call(
@@ -119,7 +108,6 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
         user_range.Call('SetValue', user_feedback)
 
         # Count average rating
-        avg_rating = round(avg_rating / len(user_feedback), 1)
         rating_cell = worksheet.Call(
             'GetRange',
             worksheet.Call('GetRangeByNumber', rows_count, cols_count),
@@ -134,7 +122,7 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
                 'GetRange',
                 worksheet.Call('GetRangeByNumber', rows_count, 0),
                 worksheet.Call('GetRangeByNumber', rows_count + user_rows_count, cols_count),
-            ).Call('SetFillColor', api.Call('CreateColorFromRGB', 237, 125, 49))
+            ).Call('SetFillColor', color_orange)
 
         # Update rows count
         rows_count += len(user_feedback)
@@ -178,11 +166,11 @@ def create_line_chart(api, worksheet, data, title):
     worksheet.Call('GetRange', data_range).Call('SetValue', average_day_rating)
     chart = worksheet.Call('AddChart', f'Charts!{data_range}', False, 'scatter', 2, 135.38 * 36000, 81.28 * 36000)
     chart.Call('SetPosition', 0, 0, 18, 0)
-    chart.Call('SetSeriesFill', get_blue_color(api), 0, False)
+    chart.Call('SetSeriesFill', color_blue, 0, False)
     stroke = api.Call(
         'CreateStroke',
         0.5 * 36000,
-        api.Call('CreateSolidFill', get_grey_color(api)),
+        api.Call('CreateSolidFill', color_grey),
     )
     chart.Call('SetSeriesOutLine', stroke, 0, False)
     chart.Call('SetTitle', title, 16)
@@ -200,9 +188,9 @@ def create_pie_chart(api, worksheet, data_range, title):
     chart = worksheet.Call('AddChart', 'Charts!$A$1:$C$2', True, 'pie', 2, 135.38 * 36000, 81.28 * 36000)
     chart.Call('SetPosition', 9, 0, 0, 0)
     chart.Call('SetTitle', title, 16)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_orange_color(api)), 0, 0)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_grey_color(api)), 0, 1)
-    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', get_blue_color(api)), 0, 2)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', api.Call('CreateRGBColor', 237, 125, 49)), 0, 0)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', color_grey), 0, 1)
+    chart.Call('SetDataPointFill', api.Call('CreateSolidFill', color_blue), 0, 2)
     stroke = api.Call(
         'CreateStroke',
         0.5 * 36000,
@@ -228,6 +216,12 @@ if __name__ == '__main__':
     context = builder.GetContext()
     global_obj = context.GetGlobal()
     api = global_obj['Api']
+
+    # Set main colors
+    color_black = api.Call('CreateColorFromRGB', 0, 0, 0)
+    color_orange = api.Call('CreateColorFromRGB', 237, 125, 49)
+    color_grey = api.Call('CreateRGBColor', 128, 128, 128)
+    color_blue = api.Call('CreateRGBColor', 91, 155, 213)
 
     # Get current worksheet
     worksheet1 = api.Call('GetActiveSheet')
