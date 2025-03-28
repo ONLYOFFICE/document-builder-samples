@@ -139,16 +139,30 @@ Generated files will be located in the `out` directory inside of the correspondi
     javac -cp "C:\Program Files\ONLYOFFICE\DocumentBuilder\docbuilder.jar" Program.java
     ```
 
- 3. `.class` file should appear in the directory. Run the program:
+    Note that some Java samples use `json_simple` library for parsing JSON files. The library is located at *resources/utils/json/json_simple-1.1.jar*. To compile these samples, you also need to add the path to `json_simple` library under `-cp` option:
+
+    ```shell
+    javac -cp "C:\Program Files\ONLYOFFICE\DocumentBuilder\docbuilder.jar;..\..\resources\utils\json\json_simple-1.1.jar" Program.java
+    ```
+
+    Also note that on UNIX systems the path separator is `:` instead of `;`. Thus, on Linux or Mac OS it should be:
+
+    ```shell
+    javac -cp "/opt/onlyoffice/documentbuilder/docbuilder.jar:../../resources/utils/json/json_simple-1.1.jar" Program.java
+    ```
+
+ 3. `.class` file should appear in the directory. Run the program with `java` and specify the same libraries under `-cp` option as in the compilation step, but also add the current directory `.`:
 
     ```shell
     java -cp "C:\Program Files\ONLYOFFICE\DocumentBuilder\docbuilder.jar;." Program
     ```
 
-    Note, that on UNIX systems the path separator is `:` instead of `;`. Thus, on Linux or Mac OS it should be:
+    Or, if the sample uses the JSON library:
 
     ```shell
-    java -cp "/opt/onlyoffice/documentbuilder/docbuilder.jar:." Program
+    java -cp "C:\Program Files\ONLYOFFICE\DocumentBuilder\docbuilder.jar;..\..\resources\utils\json\json_simple-1.1.jar;." Program
     ```
+
+    Again, the same applies to UNIX systems, but with `;` replaced with `:`.
 
  3. Documents will be created in the test directory.
