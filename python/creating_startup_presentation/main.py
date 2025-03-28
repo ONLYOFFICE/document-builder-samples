@@ -290,11 +290,11 @@ if __name__ == '__main__':
     variable_cost_per_unit = float(separateValueAndUnit(data['break_even_analysis']['variable_cost_per_unit'])[0])
     break_even_point = data['break_even_analysis']['break_even_point']
     step = break_even_point / 4
-    chart_units = range(0, break_even_point * 2 + step, step)
+    chart_units = range(0, int(break_even_point * 2 + step), int(step))
     chart_revenue = [units * selling_price_per_unit for units in chart_units]
     chart_total_costs = [fixed_costs + units * variable_cost_per_unit for units in chart_units]
     # create chart
-    chart = api.Call('CreateChart', 'lineNormal', [chart_revenue, chart_total_costs], ['Revenue', 'Total costs'], chart_units)
+    chart = api.Call('CreateChart', 'lineNormal', [chart_revenue, chart_total_costs], ['Revenue', 'Total costs'], list(chart_units))
     setChartSizes(chart, 9.17, 5.06, 0.31, 2)
     chart.Call('SetVerAxisTitle', 'Amount (%s)' % money_unit, 14, False)
     chart.Call('SetHorAxisTitle', 'Units sold', 14, False)
