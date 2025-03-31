@@ -19,9 +19,8 @@
 import docbuilder.*;
 
 import java.io.FileReader;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
@@ -46,15 +45,9 @@ public class Program {
 
     public static void createUserFeedbackReport(String resultPath, String resourcesDir) throws Exception {
         // Parse JSON
-        String jsonPath = resourcesDir + "/data/user_feedback_report_response.json";
+        String jsonPath = resourcesDir + "/data/user_feedback_data.json";
         JSONArray data = (JSONArray) new JSONParser().parse(new FileReader(jsonPath));
-
-        // Sort feedback data
-//        data.sort((a, b) -> {
-//            LocalDate dateA = LocalDate.parse(((JSONObject) a).get("date").toString(), DateTimeFormatter.ISO_LOCAL_DATE);
-//            LocalDate dateB = LocalDate.parse(((JSONObject) b).get("date").toString(), DateTimeFormatter.ISO_LOCAL_DATE);
-//            return dateA.compareTo(dateB);
-//        });
+        Locale.setDefault(Locale.US);
 
         // Init docbuilder and create xlsx file
         int doctype = FileTypes.Spreadsheet.XLSX;
@@ -116,39 +109,44 @@ public class Program {
 
     private static int fillAverageSheet(CDocBuilderValue worksheet, JSONArray feedbackData) {
         // Count detailed statistics for each question
-        Map<String, int[]> statsMap = new HashMap<>();
-        // Process each user's feedback
+        ArrayList<Object[]> statsList = new ArrayList<>();
         for (int i = 0; i < feedbackData.size(); i++) {
             JSONObject userFeedback = (JSONObject) feedbackData.get(i);
             JSONArray feedback = (JSONArray) userFeedback.get("feedback");
-
-            // Process each question in the feedback
             for (int j = 0; j < feedback.size(); j++) {
                 JSONObject feedbackItem = (JSONObject) feedback.get(j);
                 String question = feedbackItem.get("question").toString();
                 int rating = ((Long) ((JSONObject) feedbackItem.get("answer")).get("rating")).intValue();
 
-                // If question not in map, initialize with [total rating, response count]
-                statsMap.putIfAbsent(question, new int[2]);
-
-                // Update total rating and response count
-                int[] stats = statsMap.get(question);
-                stats[0] += rating;
-                stats[1]++;
+                boolean found = false;
+                for (Object[] stats : statsList) {
+                    if (question.equals(stats[0])) {
+                        stats[1] = (Integer) stats[1] + rating;
+                        stats[2] = (Integer) stats[2] + 1;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Object[] newStats = new Object[3];
+                    newStats[0] = question;
+                    newStats[1] = rating;
+                    newStats[2] = 1;
+                    statsList.add(newStats);
+                }
             }
         }
 
         // Convert results
         String[] tableHeaders = {"Question", "Average Rating", "Number of Responses"};
-        String[][] averageValues = new String[statsMap.size() + 1][tableHeaders.length];
+        String[][] averageValues = new String[statsList.size() + 1][tableHeaders.length];
         averageValues[0] = tableHeaders;
         int index = 1;
-        for (Map.Entry<String, int[]> entry : statsMap.entrySet()) {
-            int[] ratings = entry.getValue();
+        for (Object[] stats : statsList) {
             averageValues[index] = new String[]{
-                entry.getKey(),
-                String.format("%.2f", (double) ratings[0] / ratings[1]),
-                String.valueOf(ratings[1])
+                (String) stats[0],
+                String.format("%.2f", (double) ((Integer) stats[1]) / ((Integer) stats[2])),
+                String.valueOf((Integer) stats[2])
             };
             index++;
         }
@@ -263,34 +261,47 @@ public class Program {
         chart.call("SetTitle", title, 16);
     }
 
-    private static void createLineChart(CDocBuilderValue api, CDocBuilderValue worksheet, JSONArray data, String title) {
+    private static void createLineChart(CDocBuilderValue api, CDocBuilderValue worksheet, JSONArray feedbackData, String title) {
         // Count average statistics for each date
-        Map<String, int[]> avgRatingMap = new HashMap<>();
-        for (int i = 0; i < data.size(); i++) {
-            JSONObject item = (JSONObject) data.get(i);
+        ArrayList<Object[]> avgRatingList = new ArrayList<>();
+        for (int i = 0; i < feedbackData.size(); i++) {
+            JSONObject item = (JSONObject) feedbackData.get(i);
             JSONArray feedback = (JSONArray) item.get("feedback");
-
             String date = item.get("date").toString();
-            avgRatingMap.putIfAbsent(date, new int[2]);
-            int[] avgRating = avgRatingMap.get(date);
+
             for (int j = 0; j < feedback.size(); j++) {
                 JSONObject feedbackItem = (JSONObject) feedback.get(j);
                 int rating = ((Long) ((JSONObject) feedbackItem.get("answer")).get("rating")).intValue();
-                avgRating[0] += rating;
-                avgRating[1]++;
+
+                boolean found = false;
+                for (Object[] stats : avgRatingList) {
+                    if (date.equals(stats[0])) {
+                        stats[1] = (Integer) stats[1] + rating;
+                        stats[2] = (Integer) stats[2] + 1;
+                        found = true;
+                        break;
+                    }
+
+                }
+                if (!found) {
+                    Object[] newStats = new Object[3];
+                    newStats[0] = date;
+                    newStats[1] = rating;
+                    newStats[2] = 1;
+                    avgRatingList.add(newStats);
+                }
             }
         }
 
         // Convert results
         String[] headers = {"Date", "Rating"};
-        String[][] avgValues = new String[avgRatingMap.size() + 1][headers.length];
+        String[][] avgValues = new String[avgRatingList.size() + 1][headers.length];
         avgValues[0] = headers;
         int index = 1;
-        for (Map.Entry<String, int[]> entry : avgRatingMap.entrySet()) {
-            int[] ratings = entry.getValue();
+        for (Object[] stats : avgRatingList) {
             avgValues[index] = new String[]{
-                entry.getKey(),
-                String.format("%.2f", (double) ratings[0] / ratings[1])
+                (String) stats[0],
+                String.format("%.2f", (double) ((Integer) stats[1]) / ((Integer) stats[2])),
             };
             index++;
         }

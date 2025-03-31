@@ -16,7 +16,6 @@ limitations under the License.
 
 # import docbuilder
 import sys
-from datetime import datetime
 
 sys.path.append('../../out/python')
 import constants
@@ -151,10 +150,10 @@ def create_column_chart(worksheet, data_range, title):
     chart.Call('SetTitle', title, 16)
 
 
-def create_line_chart(api, worksheet, data, title):
+def create_line_chart(api, worksheet, feedback_data, title):
     average_day_rating = [['Date', 'Rating']]
     result = {}
-    for record in data:
+    for record in feedback_data:
         if record['date'] not in result.keys():
             result[record['date']] = []
         for item in record['feedback']:
@@ -202,11 +201,8 @@ def create_pie_chart(api, worksheet, data_range, title):
 if __name__ == '__main__':
     resources_dir = os.path.normpath('../../resources')
     # parse JSON
-    with open(os.path.join(resources_dir, 'data/user_feedback_report_response.json'), 'r') as file_json:
+    with open(os.path.join(resources_dir, 'data/user_feedback_data.json'), 'r') as file_json:
         data = json.load(file_json)
-
-    # Sort feedback data
-    data.sort(key=lambda k: datetime.strptime(k['date'], '%Y-%m-%d'))
 
     # init docbuilder and create new pdf file
     doctype = docbuilder.FileTypes.Spreadsheet.XLSX
