@@ -162,7 +162,7 @@ public class Program {
         CDocBuilderValue headerRow = worksheet.call("GetRange", startCell, worksheet.call("GetRangeByNumber", 0, colsCount));
         headerRow.call("SetBold", true);
 
-        averageRange.call("SetValue", new CDocBuilderValue(averageValues));
+        averageRange.call("SetValue", averageValues);
         averageRange.call("AutoFit", false, true);
 
         return averageValues.length;
@@ -173,7 +173,7 @@ public class Program {
         int colsCount = tableHeaders[0].length - 1;
         CDocBuilderValue startCell = worksheet.call("GetRangeByNumber", 0, 0);
         CDocBuilderValue headerRow = worksheet.call("GetRange", startCell, worksheet.call("GetRangeByNumber", 0, colsCount));
-        headerRow.call("SetValue", new CDocBuilderValue(tableHeaders));
+        headerRow.call("SetValue", tableHeaders);
         headerRow.call("SetBold", true);
 
         int rowsCount = 1;
@@ -213,7 +213,7 @@ public class Program {
                 worksheet.call("GetRangeByNumber", rowsCount, 1),
                 worksheet.call("GetRangeByNumber", rowsCount + userRowsCount, colsCount - 1)
             );
-            userRange.call("SetValue", new CDocBuilderValue(userFeedback));
+            userRange.call("SetValue", userFeedback);
 
             // Count average rating
             CDocBuilderValue ratingCell = worksheet.call(
@@ -307,7 +307,7 @@ public class Program {
         }
 
         String dataRange = "$E$1:$F$" + avgValues.length;
-        worksheet.call("GetRange", dataRange).call("SetValue", new CDocBuilderValue(avgValues));
+        worksheet.call("GetRange", dataRange).call("SetValue", avgValues);
 
         CDocBuilderValue chart = worksheet.call("AddChart", "Charts!" + dataRange, false, "scatter", 2, 135.38 * 36000, 81.28 * 36000);
         chart.call("SetPosition", 0, 0, 18, 0);
@@ -332,7 +332,7 @@ public class Program {
                 "=COUNTIF(" + dataRange + ", \">=4\")"
             }
         };
-        worksheet.call("GetRange", "$A$1:$C$2").call("SetValue", new CDocBuilderValue(chartData));
+        worksheet.call("GetRange", "$A$1:$C$2").call("SetValue", chartData);
 
         CDocBuilderValue chart = worksheet.call("AddChart", "Charts!$A$1:$C$2", true, "pie", 2, 135.38 * 36000, 81.28 * 36000);
         chart.call("SetPosition", 9, 0, 0, 0);
