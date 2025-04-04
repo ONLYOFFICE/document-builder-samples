@@ -23,6 +23,7 @@
 #include <cmath>
 #include <map>
 #include <vector>
+#include <sstream>
 
 #include "common.h"
 #include "docbuilder.h"
@@ -38,30 +39,29 @@ using json = nlohmann::json;
 const wchar_t* workDir = BUILDER_DIR;
 const wchar_t* resultPath = L"result.xlsx";
 
-CContext context;
 CValue color_black;
 CValue color_orange;
 CValue color_grey;
 CValue color_blue;
 
-int getSum(vector<int>& values) {
-    int sum = 0;
-    for (int value : values) {
-        sum += value;
-    }
-    return sum;
+// Helper functions
+string doubleToString(double value, int precision = 1) {
+    std::ostringstream oss;
+    oss.imbue(std::locale("en_US.UTF-8"));
+    oss << std::fixed << std::setprecision(2) << value;
+    return oss.str();
 }
 
-CValue getArrayRow(vector<string> row_data) {
+
+CValue getArrayRow(const vector<string>& row_data) {
     int rowsLen = (int) row_data.size();
-    CValue row = context.CreateArray(rowsLen);
+    CValue row = CValue::CreateArray(rowsLen);
     for (int i = 0; i < rowsLen; i++) {
         row[i] = row_data[i].c_str();
     }
     return row;
 }
 
-// Helper functions
 void setTableStyle(CValue range) {
     range.Call("SetRowHeight", 24);
     range.Call("SetAlignVertical", "center");
@@ -86,29 +86,26 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
 
             if (result.find(question) == result.end()) {
                 questionOrder.push_back(question);
-                result[question] = {rating};
-            } else {
-                result[question].push_back(rating);
             }
+            result[question].push_back(rating);
         }
     }
 
     int questionSize = (int)questionOrder.size();
-    CValue averageValues = context.CreateArray(questionSize + 1);
+    CValue averageValues = CValue::CreateArray(questionSize + 1);
     averageValues[0] = getArrayRow({"Question", "Average Rating", "Number of Responses"});
     for (int i = 0; i < questionSize; i++) {
         vector<int>& ratings = result[questionOrder[i]];
-        int sum = getSum(ratings);
-        double average = round((double)sum / ratings.size() * 10) / 10;
-        averageValues[i + 1] = getArrayRow({questionOrder[i], to_string(average), to_string(ratings.size())});
+        string average = doubleToString((double)accumulate(ratings.begin(), ratings.end(), 0) / ratings.size());
+        averageValues[i + 1] = getArrayRow({questionOrder[i], average, to_string(ratings.size())});
     }
 
     int colsCount = averageValues[0].GetLength() - 1;
     int rowsCount = averageValues.GetLength();
-    CValue startSell = worksheet.Call("GetRangeByNumber", 0, 0);
+    CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
     CValue endCell = worksheet.Call("GetRangeByNumber", rowsCount - 1, colsCount);
 
-    CValue averageRange = worksheet.Call("GetRange", startSell, endCell);
+    CValue averageRange = worksheet.Call("GetRange", startСell, endCell);
     setTableStyle(averageRange);
     worksheet.Call(
         "GetRange",
@@ -118,7 +115,7 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
 
     CValue headerRow = worksheet.Call(
         "GetRange",
-        startSell,
+        startСell,
         worksheet.Call("GetRangeByNumber", 0, colsCount)
     );
     headerRow.Call("SetBold", true);
@@ -130,13 +127,13 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
 }
 
 int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
-    CValue headerValues = context.CreateArray(1);
+    CValue headerValues = CValue::CreateArray(1);
     headerValues[0] = getArrayRow({"Date", "Question", "Comment", "Rating", "Average User Rating"});
     int colsCount = headerValues[0].GetLength() - 1;
-    CValue startSell = worksheet.Call("GetRangeByNumber", 0, 0);
+    CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
     CValue headerRow = worksheet.Call(
         "GetRange",
-        startSell,
+        startСell,
         worksheet.Call("GetRangeByNumber", 0, colsCount)
     );
 
@@ -149,7 +146,7 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
         double avgRating = 0;
 
         int feedbackSize = (int)record["feedback"].size();
-        CValue userFeedback = context.CreateArray(feedbackSize);
+        CValue userFeedback = CValue::CreateArray(feedbackSize);
         int i = 0;
         for (const auto& item : record["feedback"]) {
             string question = item["question"].get<string>();
@@ -162,8 +159,6 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
         }
 
         int userRowsCount = feedbackSize - 1;
-        avgRating = round(avgRating / feedbackSize);
-
         // Fill date
         CValue dateCell = worksheet.Call(
             "GetRange",
@@ -188,7 +183,7 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
             worksheet.Call("GetRangeByNumber", rowsCount + userRowsCount, colsCount)
         );
         ratingCell.Call("Merge", false);
-        ratingCell.Call("SetValue", to_string(avgRating).c_str());
+        ratingCell.Call("SetValue", doubleToString(avgRating / feedbackSize).c_str());
 
         // If rating <= 2, highlight it
         if (avgRating <= 2) {
@@ -207,7 +202,7 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
     rowsCount -= 1;
     CValue resultRange = worksheet.Call(
         "GetRange",
-        startSell,
+        startСell,
         worksheet.Call("GetRangeByNumber", rowsCount, colsCount)
     );
     setTableStyle(resultRange);
@@ -235,7 +230,6 @@ void createLineChart(CValue api, CValue worksheet, json& feedbackData, string ti
         string date = record["date"].get<string>();
         if (result.find(date) == result.end()) {
             dateOrder.push_back(date);
-            result[date] = {};
         }
         for (const auto& item : record["feedback"]) {
             int rating = item["answer"]["rating"].get<int>();
@@ -244,13 +238,12 @@ void createLineChart(CValue api, CValue worksheet, json& feedbackData, string ti
     }
 
     int dateSize = (int)dateOrder.size();
-    CValue averageDayRating = context.CreateArray(dateSize + 1);
+    CValue averageDayRating = CValue::CreateArray(dateSize + 1);
     averageDayRating[0] = getArrayRow({"Date", "Rating"});
     for (int i = 0; i < dateSize; i++) {
         vector<int>& ratings = result[dateOrder[i]];
-        int sum = getSum(ratings);
-        double average = round((double)sum / ratings.size() * 10) / 10;
-        averageDayRating[i + 1] = getArrayRow({dateOrder[i], to_string(average)});
+        string average = doubleToString((double)accumulate(ratings.begin(), ratings.end(), 0) / ratings.size());
+        averageDayRating[i + 1] = getArrayRow({dateOrder[i], average});
     }
 
     string dataRange = "$E$1:$F$" + to_string(averageDayRating.GetLength());
@@ -270,7 +263,7 @@ void createLineChart(CValue api, CValue worksheet, json& feedbackData, string ti
 }
 
 void createPieChart(CValue api, CValue worksheet, string dataRange, string title) {
-    CValue pieChartData = context.CreateArray(2);
+    CValue pieChartData = CValue::CreateArray(2);
     pieChartData[0] = getArrayRow({"Negative", "Neutral", "Positive"});
     pieChartData[1] = getArrayRow(
         {
@@ -307,7 +300,7 @@ int main() {
     CDocBuilder builder;
     builder.CreateFile(OFFICESTUDIO_FILE_SPREADSHEET_XLSX);
 
-    context = builder.GetContext();
+    CContext context = builder.GetContext();
     CValue global = context.GetGlobal();
     CValue api = global["Api"];
 

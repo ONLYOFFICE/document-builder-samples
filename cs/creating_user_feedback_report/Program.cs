@@ -22,7 +22,6 @@ using OfficeFileTypes = docbuilder_net.FileTypes;
 using CValue = docbuilder_net.CDocBuilderValue;
 using CContext = docbuilder_net.CDocBuilderContext;
 
-using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.IO;
@@ -32,11 +31,10 @@ namespace Sample
 {
     public class FeedbackReport
     {
-        public static CContext context;
-        public static CValue color_black;
-        public static CValue color_orange;
-        public static CValue color_grey;
-        public static CValue color_blue;
+        private static CValue color_black;
+        private static CValue color_orange;
+        private static CValue color_grey;
+        private static CValue color_blue;
 
         public static void Main()
         {
@@ -65,7 +63,7 @@ namespace Sample
             CDocBuilder builder = new();
             builder.CreateFile(doctype);
 
-            context = builder.GetContext();
+            CContext context = builder.GetContext();
             CValue global = context.GetGlobal();
             CValue api = global["Api"];
 
@@ -104,25 +102,6 @@ namespace Sample
             CDocBuilder.Destroy();
         }
 
-        public static int GetSum(List<int> values)
-        {
-            int sum = 0;
-            foreach (int value in values) {
-                sum += value;
-            }
-            return sum;
-        }
-
-        public static CValue GetArrayRow(List<string> row_data)
-        {
-            int rowsLen = row_data.Count;
-            CValue row = context.CreateArray(row_data.Count);
-            for (int i = 0; i < rowsLen; i++) {
-                row[i] = row_data[i];
-            }
-            return row;
-        }
-
         // Helper functions
         public static void SetTableStyle(CValue range)
         {
@@ -140,8 +119,8 @@ namespace Sample
 
         public static int FillAverageSheet(CValue worksheet, JsonData feedbackData)
         {
-            Dictionary<string, List<int>> result = new Dictionary<string, List<int>>();
-            List<string> questionOrder = new List<string>();
+            Dictionary<string, List<int>> result = new();
+            List<string> questionOrder = new();
 
             foreach (UserFeedback record in feedbackData) {
                 foreach (FeedbackItem item in record.feedback) {
@@ -155,21 +134,20 @@ namespace Sample
                 }
             }
 
-            CValue averageValues = context.CreateArray(questionOrder.Count + 1);
-            averageValues[0] = GetArrayRow(new List<string> { "Question", "Average Rating", "Number of Responses" });
+            CValue[] averageValues = new CValue[questionOrder.Count + 1];
+            averageValues[0] = new CValue[] { "Question", "Average Rating", "Number of Responses" };
             for (int i = 0; i < questionOrder.Count; i++) {
                 List<int> ratings = result[questionOrder[i]];
-                int sum = GetSum(ratings);
-                double average = Math.Round((double)sum / ratings.Count * 10) / 10;
-                averageValues[i + 1] = GetArrayRow(new List<string> { questionOrder[i], average.ToString(), ratings.Count.ToString() });
+                double average = (double) ratings.Sum() / ratings.Count;
+                averageValues[i + 1] = new CValue[] { questionOrder[i], $"{average:F2}", ratings.Count.ToString() };
             }
 
             int colsCount = (int)averageValues[0].GetLength() - 1;
-            int rowsCount = (int)averageValues.GetLength();
-            CValue startSell = worksheet.Call("GetRangeByNumber", 0, 0);
+            int rowsCount = (int)averageValues.Length;
+            CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
             CValue endCell = worksheet.Call("GetRangeByNumber", rowsCount - 1, colsCount);
 
-            CValue averageRange = worksheet.Call("GetRange", startSell, endCell);
+            CValue averageRange = worksheet.Call("GetRange", startСell, endCell);
             SetTableStyle(averageRange);
             worksheet.Call(
                 "GetRange",
@@ -179,7 +157,7 @@ namespace Sample
 
             CValue headerRow = worksheet.Call(
                 "GetRange",
-                startSell,
+                startСell,
                 worksheet.Call("GetRangeByNumber", 0, colsCount)
             );
             headerRow.Call("SetBold", true);
@@ -192,13 +170,13 @@ namespace Sample
 
         public static int FillPersonalRatingsAndComments(CValue worksheet, JsonData feedbackData)
         {
-            CValue headerValues = context.CreateArray(1);
-            headerValues[0] = GetArrayRow(new List<string> { "Date", "Question", "Comment", "Rating", "Average User Rating" });
+            CValue[] headerValues = new CValue[1];
+            headerValues[0] = new CValue[] { "Date", "Question", "Comment", "Rating", "Average User Rating" };
             int colsCount = (int)headerValues[0].GetLength() - 1;
-            CValue startSell = worksheet.Call("GetRangeByNumber", 0, 0);
+            CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
             CValue headerRow = worksheet.Call(
                 "GetRange",
-                startSell,
+                startСell,
                 worksheet.Call("GetRangeByNumber", 0, colsCount)
             );
 
@@ -211,17 +189,15 @@ namespace Sample
                 double avgRating = 0;
 
                 int feedbackSize = record.feedback.Count;
-                CValue userFeedback = context.CreateArray(feedbackSize);
+                CValue[] userFeedback = new CValue[feedbackSize];
                 int i = 0;
                 foreach (FeedbackItem item in record.feedback) {
-                    userFeedback[i] = GetArrayRow(new List<string> { item.question, item.answer.comment, item.answer.rating.ToString() });
+                    userFeedback[i] = new CValue[] { item.question, item.answer.comment, item.answer.rating.ToString() };
                     avgRating += item.answer.rating;
                     i++;
                 }
 
                 int userRowsCount = feedbackSize - 1;
-                avgRating = Math.Round(avgRating / feedbackSize);
-
                 // Fill date
                 CValue dateCell = worksheet.Call(
                     "GetRange",
@@ -240,6 +216,7 @@ namespace Sample
                 userRange.Call("SetValue", userFeedback);
 
                 // Count average rating
+                avgRating = avgRating / feedbackSize;
                 CValue ratingCell = worksheet
                     .Call(
                         "GetRange",
@@ -247,7 +224,7 @@ namespace Sample
                         worksheet.Call("GetRangeByNumber", rowsCount + userRowsCount, colsCount)
                     );
                 ratingCell.Call("Merge", false);
-                ratingCell.Call("SetValue", avgRating.ToString());
+                ratingCell.Call("SetValue", $"{avgRating:F2}");
 
                 // If rating <= 2, highlight it
                 if (avgRating <= 2) {
@@ -266,7 +243,7 @@ namespace Sample
             rowsCount -= 1;
             CValue resultRange = worksheet.Call(
                 "GetRange",
-                startSell,
+                startСell,
                 worksheet.Call("GetRangeByNumber", rowsCount, colsCount)
             );
             SetTableStyle(resultRange);
@@ -289,8 +266,8 @@ namespace Sample
 
         public static void CreateLineChart(CValue api, CValue worksheet, JsonData feedbackData, string title)
         {
-            Dictionary<string, List<int>> result = new Dictionary<string, List<int>>();
-            List<string> dateOrder = new List<string>();
+            Dictionary<string, List<int>> result = new();
+            List<string> dateOrder = new();
 
             foreach (UserFeedback record in feedbackData) {
                 if (!result.ContainsKey(record.date)) {
@@ -302,16 +279,15 @@ namespace Sample
                 }
             }
 
-            CValue averageDayRating = context.CreateArray(dateOrder.Count + 1);
-            averageDayRating[0] = GetArrayRow(new List<string> { "Date", "Rating" });
+            CValue[] averageDayRating = new CValue[dateOrder.Count + 1];
+            averageDayRating[0] = new CValue[] { "Date", "Rating" };
             for (int i = 0; i < dateOrder.Count; i++) {
                 List<int> ratings = result[dateOrder[i]];
-                int sum = GetSum(ratings);
-                double average = Math.Round((double)sum / ratings.Count * 10) / 10;
-                averageDayRating[i + 1] = GetArrayRow(new List<string> { dateOrder[i], average.ToString() });
+                double average = (double) ratings.Sum() / ratings.Count;
+                averageDayRating[i + 1] = new CValue[] { dateOrder[i], $"{average:F2}" };
             }
 
-            string dataRange = $"$E$1:$F${averageDayRating.GetLength()}";
+            string dataRange = $"$E$1:$F${averageDayRating.Length}";
             worksheet.Call("GetRange", dataRange).Call("SetValue", averageDayRating);
             CValue chart = worksheet.Call("AddChart", $"Charts!{dataRange}", false, "scatter", 2, 135.38 * 36000, 81.28 * 36000);
             chart.Call("SetPosition", 0, 0, 18, 0);
@@ -329,15 +305,14 @@ namespace Sample
 
         public static void CreatePieChart(CValue api, CValue worksheet, string dataRange, string title)
         {
-            CValue pieChartData = context.CreateArray(2);
-            pieChartData[0] = GetArrayRow(new List<string> { "Negative", "Neutral", "Positive" });
-            pieChartData[1] = GetArrayRow(
-                new List<string> {
+            CValue[] pieChartData = new CValue[2] {
+                new CValue[] { "Negative", "Neutral", "Positive" },
+                new CValue[] {
                     $"=COUNTIF({dataRange}, \"<=2\")",
                     $"=COUNTIF({dataRange}, \"=3\")",
                     $"=COUNTIF({dataRange}, \">=4\")"
                 }
-            );
+            };
             worksheet.Call("GetRange", "$A$1:$C$2").Call("SetValue", pieChartData);
 
             CValue chart = worksheet.Call("AddChart", "Charts!$A$1:$C$2", true, "pie", 2, 135.38 * 36000, 81.28 * 36000);
