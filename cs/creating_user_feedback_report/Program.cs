@@ -139,7 +139,7 @@ namespace Sample
             for (int i = 0; i < questionOrder.Count; i++) {
                 List<int> ratings = result[questionOrder[i]];
                 double average = (double) ratings.Sum() / ratings.Count;
-                averageValues[i + 1] = new CValue[] { questionOrder[i], $"{average:F2}", ratings.Count.ToString() };
+                averageValues[i + 1] = new CValue[] { questionOrder[i], $"{average:F1}", ratings.Count.ToString() };
             }
 
             int colsCount = (int)averageValues[0].GetLength() - 1;
@@ -224,7 +224,7 @@ namespace Sample
                         worksheet.Call("GetRangeByNumber", rowsCount + userRowsCount, colsCount)
                     );
                 ratingCell.Call("Merge", false);
-                ratingCell.Call("SetValue", $"{avgRating:F2}");
+                ratingCell.Call("SetValue", $"{avgRating:F1}");
 
                 // If rating <= 2, highlight it
                 if (avgRating <= 2) {
@@ -284,7 +284,7 @@ namespace Sample
             for (int i = 0; i < dateOrder.Count; i++) {
                 List<int> ratings = result[dateOrder[i]];
                 double average = (double) ratings.Sum() / ratings.Count;
-                averageDayRating[i + 1] = new CValue[] { dateOrder[i], $"{average:F2}" };
+                averageDayRating[i + 1] = new CValue[] { dateOrder[i], $"{average:F1}" };
             }
 
             string dataRange = $"$E$1:$F${averageDayRating.Length}";

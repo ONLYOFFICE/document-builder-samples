@@ -48,7 +48,7 @@ CValue color_blue;
 string doubleToString(double value, int precision = 1) {
     std::ostringstream oss;
     oss.imbue(std::locale("en_US.UTF-8"));
-    oss << std::fixed << std::setprecision(2) << value;
+    oss << std::fixed << std::setprecision(1) << value;
     return oss.str();
 }
 
@@ -177,13 +177,14 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
         userRange.Call("SetValue", userFeedback);
 
         // Count average rating
+        avgRating = avgRating / feedbackSize;
         CValue ratingCell = worksheet.Call(
             "GetRange",
             worksheet.Call("GetRangeByNumber", rowsCount, colsCount),
             worksheet.Call("GetRangeByNumber", rowsCount + userRowsCount, colsCount)
         );
         ratingCell.Call("Merge", false);
-        ratingCell.Call("SetValue", doubleToString(avgRating / feedbackSize).c_str());
+        ratingCell.Call("SetValue", doubleToString(avgRating).c_str());
 
         // If rating <= 2, highlight it
         if (avgRating <= 2) {
