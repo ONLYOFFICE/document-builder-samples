@@ -143,7 +143,7 @@ public class Program {
             int sum = getSum(values);
             averageValues[index] = new String[]{
                 (String) entry.getKey(),
-                String.format("%.2f", (double) (sum / values.size())),
+                String.format("%.1f", (double) sum / values.size()),
                 String.valueOf(values.size())
             };
             index++;
@@ -220,7 +220,7 @@ public class Program {
                 worksheet.call("GetRangeByNumber", rowsCount + userRowsCount, colsCount)
             );
             ratingCell.call("Merge", false);
-            ratingCell.call("SetValue", String.format("%.2f", totalRating));
+            ratingCell.call("SetValue", String.format("%.1f", totalRating));
 
             // If rating <= 2, highlight it
             if (totalRating <= 2) {
@@ -286,7 +286,7 @@ public class Program {
             int sum = getSum(values);
             avgValues[index] = new String[]{
                 (String) entry.getKey(),
-                String.format("%.2f", (double) (sum / values.size()))
+                String.format("%.1f", (double) sum / values.size())
             };
             index++;
         }
