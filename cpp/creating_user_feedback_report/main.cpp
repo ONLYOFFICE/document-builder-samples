@@ -93,9 +93,10 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
         }
     }
 
-    CValue averageValues = context.CreateArray(questionOrder.size() + 1);
+    int questionSize = (int)questionOrder.size();
+    CValue averageValues = context.CreateArray(questionSize + 1);
     averageValues[0] = getArrayRow({"Question", "Average Rating", "Number of Responses"});
-    for (int i = 0; i < questionOrder.size(); i++) {
+    for (int i = 0; i < questionSize; i++) {
         vector<int>& ratings = result[questionOrder[i]];
         int sum = getSum(ratings);
         double average = round((double)sum / ratings.size() * 10) / 10;
@@ -147,7 +148,7 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
         // Count and fill user feedback
         double avgRating = 0;
 
-        int feedbackSize = record["feedback"].size();
+        int feedbackSize = (int)record["feedback"].size();
         CValue userFeedback = context.CreateArray(feedbackSize);
         int i = 0;
         for (const auto& item : record["feedback"]) {
@@ -242,9 +243,10 @@ void createLineChart(CValue api, CValue worksheet, json& feedbackData, string ti
         }
     }
 
-    CValue averageDayRating = context.CreateArray(dateOrder.size() + 1);
+    int dateSize = (int)dateOrder.size();
+    CValue averageDayRating = context.CreateArray(dateSize + 1);
     averageDayRating[0] = getArrayRow({"Date", "Rating"});
-    for (int i = 0; i < dateOrder.size(); i++) {
+    for (int i = 0; i < dateSize; i++) {
         vector<int>& ratings = result[dateOrder[i]];
         int sum = getSum(ratings);
         double average = round((double)sum / ratings.size() * 10) / 10;
