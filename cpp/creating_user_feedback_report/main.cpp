@@ -48,7 +48,7 @@ CValue color_blue;
 string doubleToString(double value, int precision = 1) {
     std::ostringstream oss;
     oss.imbue(std::locale("en_US.UTF-8"));
-    oss << std::fixed << std::setprecision(1) << value;
+    oss << std::fixed << std::setprecision(precision) << value;
     return oss.str();
 }
 
