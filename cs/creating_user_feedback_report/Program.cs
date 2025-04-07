@@ -144,10 +144,10 @@ namespace Sample
 
             int colsCount = (int)averageValues[0].GetLength() - 1;
             int rowsCount = (int)averageValues.Length;
-            CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
+            CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
             CValue endCell = worksheet.Call("GetRangeByNumber", rowsCount - 1, colsCount);
 
-            CValue averageRange = worksheet.Call("GetRange", startСell, endCell);
+            CValue averageRange = worksheet.Call("GetRange", startCell, endCell);
             SetTableStyle(averageRange);
             worksheet.Call(
                 "GetRange",
@@ -157,7 +157,7 @@ namespace Sample
 
             CValue headerRow = worksheet.Call(
                 "GetRange",
-                startСell,
+                startCell,
                 worksheet.Call("GetRangeByNumber", 0, colsCount)
             );
             headerRow.Call("SetBold", true);
@@ -173,10 +173,10 @@ namespace Sample
             CValue[] headerValues = new CValue[1];
             headerValues[0] = new CValue[] { "Date", "Question", "Comment", "Rating", "Average User Rating" };
             int colsCount = (int)headerValues[0].GetLength() - 1;
-            CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
+            CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
             CValue headerRow = worksheet.Call(
                 "GetRange",
-                startСell,
+                startCell,
                 worksheet.Call("GetRangeByNumber", 0, colsCount)
             );
 
@@ -243,7 +243,7 @@ namespace Sample
             rowsCount -= 1;
             CValue resultRange = worksheet.Call(
                 "GetRange",
-                startСell,
+                startCell,
                 worksheet.Call("GetRangeByNumber", rowsCount, colsCount)
             );
             SetTableStyle(resultRange);

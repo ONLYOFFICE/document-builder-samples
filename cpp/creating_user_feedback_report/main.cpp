@@ -102,10 +102,10 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
 
     int colsCount = averageValues[0].GetLength() - 1;
     int rowsCount = averageValues.GetLength();
-    CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
+    CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
     CValue endCell = worksheet.Call("GetRangeByNumber", rowsCount - 1, colsCount);
 
-    CValue averageRange = worksheet.Call("GetRange", startСell, endCell);
+    CValue averageRange = worksheet.Call("GetRange", startCell, endCell);
     setTableStyle(averageRange);
     worksheet.Call(
         "GetRange",
@@ -115,7 +115,7 @@ int fillAverageSheet(CValue worksheet, json& feedbackData) {
 
     CValue headerRow = worksheet.Call(
         "GetRange",
-        startСell,
+        startCell,
         worksheet.Call("GetRangeByNumber", 0, colsCount)
     );
     headerRow.Call("SetBold", true);
@@ -130,10 +130,10 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
     CValue headerValues = CValue::CreateArray(1);
     headerValues[0] = getArrayRow({"Date", "Question", "Comment", "Rating", "Average User Rating"});
     int colsCount = headerValues[0].GetLength() - 1;
-    CValue startСell = worksheet.Call("GetRangeByNumber", 0, 0);
+    CValue startCell = worksheet.Call("GetRangeByNumber", 0, 0);
     CValue headerRow = worksheet.Call(
         "GetRange",
-        startСell,
+        startCell,
         worksheet.Call("GetRangeByNumber", 0, colsCount)
     );
 
@@ -203,7 +203,7 @@ int fillPersonalRatingsAndComments(CValue worksheet, json& feedbackData) {
     rowsCount -= 1;
     CValue resultRange = worksheet.Call(
         "GetRange",
-        startСell,
+        startCell,
         worksheet.Call("GetRangeByNumber", rowsCount, colsCount)
     );
     setTableStyle(resultRange);

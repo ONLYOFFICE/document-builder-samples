@@ -52,14 +52,14 @@ def fill_average_sheet(worksheet, feedback_data):
         average_values.append([key, round(sum(value) / len(value), 1), len(value)])
 
     cols_count = len(average_values[0]) - 1
-    start_sell = worksheet.Call('GetRangeByNumber', 0, 0)
+    start_cell = worksheet.Call('GetRangeByNumber', 0, 0)
     end_cell = worksheet.Call('GetRangeByNumber', len(average_values) - 1, cols_count)
 
-    average_range = worksheet.Call('GetRange', start_sell, end_cell)
+    average_range = worksheet.Call('GetRange', start_cell, end_cell)
     set_table_style(average_range)
     worksheet.Call('GetRange', worksheet.Call('GetRangeByNumber', 1, 1), end_cell).Call('SetAlignHorizontal', 'center')
 
-    header_row = worksheet.Call('GetRange', start_sell, worksheet.Call('GetRangeByNumber', 0, cols_count))
+    header_row = worksheet.Call('GetRange', start_cell, worksheet.Call('GetRangeByNumber', 0, cols_count))
     header_row.Call('SetBold', True)
 
     average_range.Call('SetValue', average_values)
@@ -71,9 +71,9 @@ def fill_average_sheet(worksheet, feedback_data):
 def fill_personal_ratings_and_comments(worksheet, feedback_data):
     header_values = [['Date', 'Question', 'Comment', 'Rating', 'Average User Rating']]
     cols_count = len(header_values[0]) - 1
-    start_sell = worksheet.Call('GetRangeByNumber', 0, 0)
+    start_cell = worksheet.Call('GetRangeByNumber', 0, 0)
 
-    header_row = worksheet.Call('GetRange', start_sell, worksheet.Call('GetRangeByNumber', 0, cols_count))
+    header_row = worksheet.Call('GetRange', start_cell, worksheet.Call('GetRangeByNumber', 0, cols_count))
     header_row.Call('SetValue', header_values)
     header_row.Call('SetBold', True)
 
@@ -130,7 +130,7 @@ def fill_personal_ratings_and_comments(worksheet, feedback_data):
     rows_count -= 1
     result_range = worksheet.Call(
         'GetRange',
-        start_sell,
+        start_cell,
         worksheet.Call('GetRangeByNumber', rows_count, cols_count),
     )
     set_table_style(result_range)
