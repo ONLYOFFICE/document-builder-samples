@@ -1,0 +1,102 @@
+[
+    {
+        "user_id": "U123",
+        "date": "2024-01-10",
+        "feedback": [
+            {
+                "question": "How would you rate our service?",
+                "answer": {
+                    "rating": 5,
+                    "comment": "Excellent, I liked everything!"
+                }
+            },
+            {
+                "question": "Would you recommend us to your friends?",
+                "answer": {
+                    "rating": 4,
+                    "comment": "Probably yes."
+                }
+            }
+        ]
+    },
+    {
+        "user_id": "U124",
+        "date": "2024-01-12",
+        "feedback": [
+            {
+                "question": "How would you rate our service?",
+                "answer": {
+                    "rating": 2,
+                    "comment": "Inconvenient interface."
+                }
+            },
+            {
+                "question": "Would you recommend us to your friends?",
+                "answer": {
+                    "rating": 1,
+                    "comment": "Absolutely not, terrible."
+                }
+            }
+        ]
+    },
+    {
+        "user_id": "U125",
+        "date": "2024-02-01",
+        "feedback": [
+            {
+                "question": "How would you rate our service?",
+                "answer": {
+                    "rating": 3,
+                    "comment": "Average level."
+                }
+            },
+            {
+                "question": "Would you recommend us to your friends?",
+                "answer": {
+                    "rating": 3,
+                    "comment": "Maybe."
+                }
+            }
+        ]
+    },
+    {
+        "user_id": "U126",
+        "date": "2024-02-15",
+        "feedback": [
+            {
+                "question": "How would you rate our service?",
+                "answer": {
+                    "rating": 1,
+                    "comment": "Terrible service."
+                }
+            },
+            {
+                "question": "Would you recommend us to your friends?",
+                "answer": {
+                    "rating": 2,
+                    "comment": "Definitely not."
+                }
+            }
+        ]
+    },
+    {
+        "user_id": "U127",
+        "date": "2024-02-15",
+        "feedback": [
+            {
+                "question": "How would you rate our service?",
+                "answer": {
+                    "rating": 4,
+                    "comment": "Good service, but there is room for improvement."
+                }
+            },
+            {
+                "question": "Would you recommend us to your friends?",
+                "answer": {
+                    "rating": 4,
+                    "comment": "Yes, I think they would like it"
+                }
+            }
+        ]
+    }
+]

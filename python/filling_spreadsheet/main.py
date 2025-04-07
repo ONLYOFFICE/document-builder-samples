@@ -44,15 +44,12 @@ if __name__ == '__main__':
     # Get current worksheet
     worksheet = api.Call('GetActiveSheet')
 
-    # Create array from data
-    array = docbuilder.CDocBuilderValue(data)
-
     # First cell in the range (A1) is equal to (0,0)
     startCell = worksheet.Call('GetRangeByNumber', 0, 0)
 
-    # Last cell in the range is equal to array length -1
+    # Last cell in the range is equal to data length -1
     endCell = worksheet.Call('GetRangeByNumber', len(data) - 1, len(data[0]) - 1)
-    worksheet.Call('GetRange', startCell, endCell).Call('SetValue', array)
+    worksheet.Call('GetRange', startCell, endCell).Call('SetValue', data)
 
     # Save and close
     resultPath = os.getcwd() + '/result.xlsx'

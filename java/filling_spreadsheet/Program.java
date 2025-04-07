@@ -55,13 +55,11 @@ public class Program {
         // Get current worksheet
         CDocBuilderValue worksheet = api.call("GetActiveSheet");
 
-        // Convert data to array value type
-        CDocBuilderValue array = new CDocBuilderValue(data);
         // First cell in the range (A1) is equal to (0,0)
         CDocBuilderValue startCell = worksheet.call("GetRangeByNumber", 0, 0);
         // Last cell in the range is equal to array length -1
-        CDocBuilderValue endCell = worksheet.call("GetRangeByNumber", array.getLength() - 1, array.get(0).getLength() - 1);
-        worksheet.call("GetRange", startCell, endCell).call("SetValue", array);
+        CDocBuilderValue endCell = worksheet.call("GetRangeByNumber", data.length - 1, data[0].length - 1);
+        worksheet.call("GetRange", startCell, endCell).call("SetValue", data);
 
         // Save file and close DocBuilder
         builder.saveFile(doctype, resultPath);
