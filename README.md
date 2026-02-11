@@ -88,7 +88,7 @@ Generated files will be located in the `out` directory inside of the correspondi
 
 ## Running C# samples
 
-> **NOTE:** Only available on Windows with Visual Studio and .NET SDK installed
+> **NOTE:** Document Builder with .NET is only available on Windows with Visual Studio and .NET SDK installed. We don't provide a pre-built .NET integration for Linux or macOS at this time.
 
 ### Visual Studio
  1. Use `configure.py` to generate VS project files. For example:
