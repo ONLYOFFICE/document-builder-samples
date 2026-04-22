@@ -233,7 +233,7 @@ if __name__ == '__main__':
     document.Call('Push', table_header)
 
     # table content
-    items_table = api.Call('CreateTable', 4, len(data["offer_details"]) + 1)
+    items_table = api.Call('CreateTable', len(data["offer_details"]) + 1, 4)
     document.Call('Push', items_table)
     setup_table_style(document, items_table)
     fill_table_content(items_table, data["offer_details"])

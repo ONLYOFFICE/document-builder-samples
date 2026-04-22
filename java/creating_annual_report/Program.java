@@ -178,7 +178,7 @@ public class Program {
 
     public static CDocBuilderValue createTable(CDocBuilderValue api, int rows, int cols, int borderColor) {
         // create table
-        CDocBuilderValue table = api.call("CreateTable", cols, rows);
+        CDocBuilderValue table = api.call("CreateTable", rows, cols);
         // set table properties;
         table.call("SetWidth", "percent", 100);
         table.call("SetTableCellMarginTop", 200);

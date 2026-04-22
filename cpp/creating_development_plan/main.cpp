@@ -46,7 +46,7 @@ void addTextToParagraph(CValue paragraph, string text, int fontSize, bool isBold
 CValue createTable(CValue api, int rows, int cols, int borderColor = 200)
 {
     // create table
-    CValue table = api.Call("CreateTable", cols, rows);
+    CValue table = api.Call("CreateTable", rows, cols);
     // set table properties;
     table.Call("SetWidth", "percent", 100);
     table.Call("SetTableCellMarginTop", 200);

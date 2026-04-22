@@ -143,7 +143,7 @@ public class Program {
 
         // table content
         JSONArray items = (JSONArray)data.get("items");
-        CDocBuilderValue itemsTable = api.call("CreateTable", 4, items.size() + 2);
+        CDocBuilderValue itemsTable = api.call("CreateTable", items.size() + 2, 4);
         document.call("Push", itemsTable);
         setupTableStyle(document, itemsTable);
         fillTableContent(itemsTable, items);

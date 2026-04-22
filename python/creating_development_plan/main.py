@@ -32,7 +32,7 @@ def addTextToParagraph(paragraph, text, font_size, is_bold=False, jc='left'):
 
 def createTable(api, rows, cols, border_color=200):
     # create table
-    table = api.Call('CreateTable', cols, rows)
+    table = api.Call('CreateTable', rows, cols)
     # set table properties
     table.Call('SetWidth', 'percent', 100)
     table.Call('SetTableCellMarginTop', 200)

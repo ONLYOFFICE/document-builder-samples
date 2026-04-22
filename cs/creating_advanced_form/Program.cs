@@ -128,7 +128,7 @@ namespace Sample
 
         public static CValue CreateFullWidthTable(CValue api, int rows, int cols, int borderColor)
         {
-            CValue table = api.Call("CreateTable", cols, rows);
+            CValue table = api.Call("CreateTable", rows, cols);
             table.Call("SetWidth", "percent", 100);
             SetTableBorders(table, borderColor);
             return table;

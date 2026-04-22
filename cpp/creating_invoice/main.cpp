@@ -243,7 +243,7 @@ int main() {
 
     // table content
     json items = data["items"];
-    CValue itemsTable = api.Call("CreateTable", 4, (int)items.size() + 2);
+    CValue itemsTable = api.Call("CreateTable", (int)items.size() + 2, 4);
     document.Call("Push", itemsTable);
     setupTableStyle(document, itemsTable);
     fillTableContent(itemsTable, items);

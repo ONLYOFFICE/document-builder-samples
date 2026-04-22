@@ -145,7 +145,7 @@ namespace Sample
 
             // table content
             List<Item> items = data.items;
-            CValue itemsTable = api.Call("CreateTable", 4, items.Count + 2);
+            CValue itemsTable = api.Call("CreateTable", items.Count + 2, 4);
             document.Call("Push", itemsTable);
             SetupTableStyle(document, itemsTable);
             FillTableContent(itemsTable, items);
